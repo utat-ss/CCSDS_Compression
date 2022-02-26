@@ -1,31 +1,26 @@
 #Purpose: losslessly (or near-losslessly) decompress an image which was compressed by the 
 #         CCSDS123 standard compression.
-#Current issue: to run the prediction algorithm again on the ground, we must perform a local difference calculation. However, 
-#the local difference calculation depends on the original data values in previous spectral bands, which we've not calculated
-#yet as we move through the image. Need to read through C implementation to understand how this step is performed.
+
 import numpy as np
 import helperlib
 import compression as comp
 
-dynamic_range = 10
-Nx =3
-Ny = 3
-Nz = 3 #Will be passed from compressor
-s_min = -1*(2**(dynamic_range-1))
-s_max = 2**(dynamic_range-1)
+
+s_min = -1*(2**(comp.dynamic_range-1))
+s_max = 2**(comp.dynamic_range-1)
 s_mid = 0
 
 #Entropy encoder metadata that must be passed on from compressor:
-u_max = 8
-initial_count_exp = 1
-accum_initial_constant = 0
-gamma = 5
-if (accum_initial_constant>30-dynamic_range):
-    k_zprime = 2*accum_initial_constant + dynamic_range - 30
+comp.u_max = 8
+comp.initial_count_exp = 1
+comp.accum_initial_constant = 0
+comp.gamma = 5
+if (comp.accum_initial_constant>30-comp.dynamic_range):
+    k_zprime = 2*comp.accum_initial_constant + comp.dynamic_range - 30
 else:
-    k_zprime = accum_initial_constant
+    k_zprime = comp.accum_initial_constant
 
-def decode(encoded):
+def decode(encoded, Nz, Nx, Ny):
     data = []
     i = 0
     q = 0
@@ -38,13 +33,13 @@ def decode(encoded):
             continue
 
         if (t == 0): #If we've arrived at a new band, reset t, counter, and accum values
-            counter = 2**initial_count_exp
+            counter = 2**comp.initial_count_exp
             accum_value = np.floor((1/(2**7))*((3*(2**(k_zprime+6)))-49)*counter)
-            value = encoded[i:i+dynamic_range]
+            value = encoded[i:i+comp.dynamic_range]
             r = helperlib.bin_to_dec(value)
             
             data.append(r)
-            i+=dynamic_range
+            i+=comp.dynamic_range
             t+=1
             continue
 
@@ -52,7 +47,7 @@ def decode(encoded):
         if (2*counter>accum_value+np.floor((49/(2**7))*counter)): #Set code parameter
             code_param = 0
         else:    
-            for j in range(dynamic_range, 0, -1):
+            for j in range(comp.dynamic_range, 0, -1):
                 if (counter*(2**j)<= accum_value+np.floor((49/(2**7))*counter)):
                     code_param = j
                     break  
@@ -66,9 +61,9 @@ def decode(encoded):
             i+=1 #skip the zero
             
             
-            if (q == u_max):
-                remain = encoded[i:i+dynamic_range]
-                i+=dynamic_range
+            if (q == comp.u_max):
+                remain = encoded[i:i+comp.dynamic_range]
+                i+=comp.dynamic_range
                 r = helperlib.bin_to_dec(remain)
                 value = r
             else:
@@ -90,16 +85,16 @@ def decode(encoded):
             t += 1
 
             #Update counter and accumlator values for the next codeword
-            if (counter< 2**gamma - 1):
+            if (counter< 2**comp.gamma - 1):
                 accum_value = accum_value + value
                 counter = counter + 1
-            elif (counter == 2**gamma - 1):
+            elif (counter == 2**comp.gamma - 1):
                 accum_value = np.floor((accum_value + value +1)/2)
                 counter = np.floor((counter+1)/2)
      
     data = np.array(data)
      
-    data.shape = (3,3,3)
+    data = np.reshape(data, (Nz, Ny, Nx))
 
     return data
 
@@ -139,7 +134,7 @@ def unmap(predicted_sample, mapped, dr_samp):
     sample = delta + predicted_sample
     return sample, delta
 
-def unpredict(mapped):
+def unpredict(mapped, Nz, Ny, Nx):
     data = np.zeros_like(mapped)
     for z in range(Nz-1, -1,-1):
         for y in range(0, Ny):

@@ -1,10 +1,8 @@
 '''
 Yong Da Li
 Saturday, May 15, 2021
-
 writing some tests to check the helper functions in
 Jasnoor's and Ketan's CCSDS compression
-
 blue books: https://public.ccsds.org/publications/bluebooks.aspx
 - Low-Complexity Lossless and Near-Lossless Multispectral and Hyperspectral Image Compression
 - they released like different versions
@@ -47,7 +45,7 @@ data_two = np.reshape(data_two, (10,10,10))
 
 def pictures():
 	# scripts for testing
-	indian_pines = scipy.io.loadmat("images/Indian_pines.mat")
+	indian_pines = scipy.io.loadmat("UTAT_Compression_Algorithm/images/Indian_pines.mat")
 
 	# scipy.io.loadmat() returns dictionary of data
 	print(indian_pines.keys())
@@ -79,7 +77,7 @@ def pictures():
 
 
 def load_pic():
-	data = scipy.io.loadmat("images/Indian_pines.mat")
+	data = scipy.io.loadmat("UTAT_Compression_Algorithm/images/Indian_pines.mat")
 	data = data['indian_pines'] # data is dictionary, only take the array part
 
 	return data
@@ -323,9 +321,10 @@ def unpredict_visualize(data):
 					weight_vector_new=comp.weight_update(dr_samp,predicted_sample,predicted_residual,t,Nx,w_prev,weight_vector_new,ld_vector,z,Nz)
 	
 	encoded = comp.encoder(mapped)
-	decoded = decomp.decode(encoded)
-	print(mapped)
-	data_final = decomp.unpredict(decoded)
+	
+	decoded = decomp.decode(encoded, Nz, Ny, Nx)
+	
+	data_final = decomp.unpredict(decoded, Nz, Ny, Nx)
 	print(data_final)
 	
 
@@ -333,12 +332,14 @@ def unpredict_visualize(data):
 
 #local_sums_visualize(data_one)
 #diff_vector_visualize(data_one)
-#weight_vector_visualize()
+#weight_vector_visualize(data_one)
 #prediction_calculation_visualize(data_one)
 #weight_vector_update_visualize(data_one)
+indian_pines = load_pic()
+subset = indian_pines[0:10, 0:10, 0:10]
 #mapper_visualize(data_one)
 #encoder_visualize(data_one)
 #decoder_visualize(data_one)
-unpredict_visualize(data_one)
+#unpredict_visualize(data_one)
 
 #weight_vector_update_visualize(data_two)
