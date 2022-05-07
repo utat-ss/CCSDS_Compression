@@ -1,10 +1,10 @@
+#include <math.h>
+#include <gsl/gsl_vector.h>
+
 /*
 This file implements helper functions used in the compression and 
 decompression steps.
 */
-#include <math.h>
-#include <stdlib.h>
-#include <gsl/gsl_vector_int.h>
 
 //Returns the sign of an integer, with 0 returned as a positive
 int sign(int x) {
@@ -12,6 +12,14 @@ int sign(int x) {
     else return -1;
 }
 
+double clamp(double x, double min, double max){
+    double result = x;
+    if (x < min)
+        result = min;
+    else if (x > max)
+        result = max;
+    return result;
+}
 //Returns a binary array from a decimal
 //Binary arrays are stored as GSL integer vectors
 gsl_vector_int* dec_to_bin(int num, int width){
