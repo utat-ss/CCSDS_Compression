@@ -4,6 +4,7 @@ decompression steps.
 */
 #include <math.h>
 #include <stdlib.h>
+#include <gsl/gsl_vector_int.h>
 
 //Returns the sign of an integer, with 0 returned as a positive
 int sign(int x) {
@@ -11,44 +12,15 @@ int sign(int x) {
     else return -1;
 }
 
-
-//Type definition for a binary array
-typedef struct {
-    int* array;
-    int size;
-
-} binArray;
-
-binArray* binArray_init(int size)
-{
-    if(size < 1)
-    {
-        size = 1;
-    }
-
-    binArray* array = malloc(sizeof(binArray));
-    array->array = calloc(size, sizeof(int));
-    array->size  = size;
-
-    return array;
-}
-
-int binArray_free(binArray* bin){
-    free(bin->array);
-    free(bin);
-
-    return 0;
-}
-
-
 //Returns a binary array from a decimal
-binArray* dec_to_bin(int num, int width){
-    binArray* bin = binArray_init(width);
+//Binary arrays are stored as GSL integer vectors
+gsl_vector_int* dec_to_bin(int num, int width){
+    gsl_vector_int* bin = gsl_vector_int_alloc(width);
 
     int i = 0;
     while (i < width){
         
-        bin->array[i] = num % 2;
+        gsl_vector_int_set(bin, i, num %2);
         
         num = num / 2;
         
@@ -59,11 +31,11 @@ binArray* dec_to_bin(int num, int width){
 }
 
 //Returns a decimal converted from a binary array
-int bin_to_dec(binArray* bin) {
+int bin_to_dec(gsl_vector_int* bin) {
     int dec = 0;
     
     for (int i = 0; i < bin->size; i++){
-        dec += pow(2, i) * bin->array[i];
+        dec += pow(2, i) * gsl_vector_int_get(bin, i);
     }
 
     return dec;
