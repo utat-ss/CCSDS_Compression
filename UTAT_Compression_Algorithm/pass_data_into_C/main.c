@@ -32,14 +32,12 @@ how to pass a file into a c program
  * returns: 3-D array that is the datacube
  */
 
-int*** parse(char* in_file, int* num_row, int* num_col, int* num_depth){
+int* parse(char* in_file, int* num_row, int* num_col, int* num_depth){
     // setup variables
     FILE *fp;
     char row[MAXCHAR];
     char *token;
-    int i = 0; // indexing
-    int j = 0;
-    int k = 0;
+    int i = 0;
 
     printf("reading from file: %s\n", in_file); 
 
@@ -83,27 +81,27 @@ int*** parse(char* in_file, int* num_row, int* num_col, int* num_depth){
         }
     }
 
+    free(fp);
+    free(token);
 
-    int*** dataCube = (int***) malloc(sizeof(int ***) * (*num_row));
+    return flat_arr;
+}
 
-    // create rows
-    for (i=0; i < *num_row; i++){
-        dataCube[i] = (int**) malloc(sizeof(int*) * (*num_col));
-
-        // create columns
-        for (j=0; j < *num_col; j++){
-            dataCube[i][j] = (int*) malloc(sizeof(int) * (*num_depth));
-
-            // load data
-            for(k=0; k < *num_depth; k++){
-                dataCube[i][j][k] = flat_arr[i*(*num_row * *num_col) + j*(*num_col) + k];
-            }
-        }
-    }
-
-    free (flat_arr);
-    free (fp);
-    return dataCube;
+/**
+ * given a flat array, get the x,y,z data element
+ *
+ * don't actually need the zlen, but include it for clarity
+ *
+ * passing in (0,2,3) will return the `o` in position (0,2) 
+ * in slice 3
+ * 
+ * x, x, x, x
+ * x, x, x, x
+ * o, x, x, x
+ * x, x, x, x
+ */
+int get_data(int* arr, int xlen, int ylen, int zlen, int x, int y, int z){
+    return arr[ (z*(xlen*ylen)) + (y*xlen) + x];
 }
 
 
@@ -124,10 +122,10 @@ int main( int argc, char *argv[] )  {
       printf("Please give 2 arguments.\n");
     }
 
-    int*** dataCube;
+    int* data;
     int num_row, num_col, num_depth;
 
-    dataCube = parse(argv[1], &num_row, &num_col, &num_depth);
+    data = parse(argv[1], &num_row, &num_col, &num_depth);
 
     printf("num_row: %d\n", num_row);
     printf("num_col: %d\n", num_col);
@@ -140,7 +138,7 @@ int main( int argc, char *argv[] )  {
     for (i=0; i<3; i++){
         for (j=0; j<3; j++){
             for (k=0; k<3; k++){
-                printf("dataCube[%d][%d][%d]: %d\n", i,j,k, dataCube[i][j][k]);
+                printf("data[%d][%d][%d]: %d\n", i,j,k, get_data(data, num_row, num_col, num_depth, i, j, k));
             }
         }
     }
