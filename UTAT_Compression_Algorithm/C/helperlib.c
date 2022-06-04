@@ -1,29 +1,35 @@
 
 
 /*
-This file implements helper functions used in the compression and 
+This file implements helper functions used in the compression and
 decompression steps.
 */
+#include "helperlib.h"
 
-//Returns the sign of an integer, with 0 returned as a positive
-int sign(int x) {
-    if (x >= 0){
+// Returns the sign of an integer, with 0 returned as a positive
+int sign(double x)
+{
+    if (x >= 0)
+    {
         return 1;
-    } 
-    else {
+    }
+    else
+    {
         return -1;
     }
 }
 
-int clamp(int x, int min, int max){
-    int result = x;
-    if (x < min) {
+double clamp(double x, double min, double max)
+{
+    double result = x;
+    if (x < min)
+    {
         result = min;
     }
-    else if (x > max) {
+    else if (x > max)
+    {
         result = max;
     }
+
     return result;
 }
-
-
