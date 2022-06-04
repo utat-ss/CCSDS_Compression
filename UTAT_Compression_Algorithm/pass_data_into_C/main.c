@@ -68,6 +68,7 @@ double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
     // read everything into a flat 1-D array
     // convert this array into a 3D array later
     double *flat_arr = (double *)malloc(sizeof(double) * (*num_row) * (*num_col) * (*num_depth));
+    int count = 0;
 
     // load the rest of the data
     while (feof(fp) != true)
@@ -111,24 +112,25 @@ double get_data(double *arr, int xlen, int ylen, int zlen, int x, int y, int z)
     return arr[(z * (xlen * ylen)) + (y * xlen) + x];
 }
 
-gsl_matrix_view *parse_into_cube(double *arr, int xlen, int ylen, int zlen)
-{
-    gsl_matrix_view *data[xlen];
-    for (int i = 0; i < xlen; i++)
-    {
-        double mat[ylen * zlen];
-        for (int j = 0; j < ylen; j++)
-        {
-            for (int k = 0; k < zlen; k++)
-            {
-                mat[j + (k * ylen)] = get_data(arr, xlen, ylen, zlen, i, j, k);
-            }
-        }
-        gsl_matrix_view gsl_mat = gsl_matrix_view_array(mat, 0, ylen * zlen);
-        data[i] = &gsl_mat;
-    }
-    return *data;
-}
+// gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
+// {
+
+//     gsl_matrix_view *items = (gsl_matrix_view *)malloc(zlen * sizeof(gsl_matrix_view));
+//     for (int i = 0; i < zlen; i++)
+//     {
+//         double mat[xlen * ylen];
+//         for (int j = 0; j < xlen; j++)
+//         {
+//             for (int k = 0; k < ylen; k++)
+//             {
+//                 mat[j + (k * xlen)] = get_data(arr, xlen, ylen, zlen, i, j, k);
+//             }
+//         }
+//         gsl_matrix_view gsl_mat = gsl_matrix_view_array(mat, 1, xlen * ylen);
+//         items[i] = gsl_mat;
+//     }
+//     return items;
+// }
 
 /*
  === arguments ==
@@ -175,12 +177,12 @@ int main(int argc, char *argv[])
     }
 
     // gsl_matrix_view *dataCube;
-    // dataCube = parse_into_cube(data, num_row, num_col, num_depth);
+    // dataCube = parse_into_gsl(data, num_row, num_col, num_depth);
     // gsl_matrix_view mat = dataCube[0];
 
-    // for (size_t row = 0; row < num_col; ++row)
+    // for (int row = 0; row < num_row; row++)
     // {
-    //     for (size_t col = 0; col < num_depth; ++col)
+    //     for (int col = 0; col < num_col; col++)
     //     {
     //         printf("\t%3.1f", gsl_matrix_get(&mat.matrix, row, col));
     //     }
