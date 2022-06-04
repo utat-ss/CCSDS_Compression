@@ -2,7 +2,7 @@
 #define HELPERLIB
 
 // helper functions
-int sign(int x);
+int sign(double x);
 double clamp(double x, double min, double max);
 
 #endif

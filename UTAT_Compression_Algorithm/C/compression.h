@@ -14,6 +14,7 @@ void localDifference(int x, int y, int z, dataCube *data, double local_sum, gsl_
 void weightInitialization(gsl_vector *weight, int z, int Nz);
 void predictionCalculation(gsl_vector *local_d, gsl_vector *weight, int local_sum, int t, int data, double *dr_sample_value, double *pred_sample_value, double *pred_residual);
 void weightUpdate(double dr_sample_value, double pred_sample, double pred_residual, int t, int z, int Nx, int Nz, gsl_vector *weight_vector_prev, gsl_vector *local_d, gsl_vector *weight);
+void mapper(double pred_samp, double pred_residual, double dr_samp, int t, unsigned int *mapped);
 
 // Local parameters for compression
 #define dynamic_range 16

@@ -200,3 +200,39 @@ void weightUpdate(double dr_sample_value, double pred_sample, double pred_residu
     gsl_vector_free(weight_vector_prev);
     gsl_vector_free(local_d);
 }
+
+/*Maps predicted residuals to unsigned integers: final compression step
+Input: predicted sample value, predicted residual value, double resolution sample value, t
+
+Output: mapped value
+*/
+void mapper(double pred_samp, double pred_residual, double dr_samp, int t, unsigned int *mapped)
+{
+    double theta = 0;
+    double s_min = (-1 * (pow(2, dynamic_range - 1)));
+    double s_max = pow(2, dynamic_range - 1);
+
+    // Calculate theta
+    if (t == 0)
+    {
+        theta = fmin(pred_samp - s_min, s_max - pred_samp);
+    }
+    else
+    {
+        theta = fmin(floor((pred_samp - s_min + max_error) / (2 * max_error + 1)), floor((s_max - pred_samp + max_error) / (2 * max_error + 1)));
+    }
+
+    // Determine mapped value
+    if (abs(pred_residual > theta))
+    {
+        *mapped = (unsigned int)abs(pred_residual) + theta;
+    }
+    else if (((int)dr_samp % 2 == 0 && pred_residual >= 0) || ((int)dr_samp % 2 != 0 && pred_residual <= 0))
+    {
+        *mapped = (unsigned int)2 * abs(pred_residual);
+    }
+    else
+    {
+        *mapped = (unsigned int)2 * abs(pred_residual) - 1;
+    }
+}
