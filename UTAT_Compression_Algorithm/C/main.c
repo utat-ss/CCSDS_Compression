@@ -2,15 +2,14 @@
 
 #include "compression.h"
 
+int main()
+{
 
-
-int main(){
-
-    //Unit test for Prediction Calculation
+    // Unit test for Prediction Calculation
     printf("Creating a local difference vector of size 5 with all values equal to 5\n");
     printf("Creating a weights vector of size 5 with all values equal to 3\n ");
-    gsl_vector* local = gsl_vector_calloc(5);
-    gsl_vector* weights = gsl_vector_calloc(5);
+    gsl_vector *local = gsl_vector_calloc(5);
+    gsl_vector *weights = gsl_vector_calloc(5);
     gsl_vector_set_all(local, 5);
     gsl_vector_set_all(weights, 3);
     printf("Setting t = 3, Local Sum = 13, Data = 16\n");
