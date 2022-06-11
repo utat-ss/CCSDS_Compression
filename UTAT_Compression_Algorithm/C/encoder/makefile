@@ -2,6 +2,7 @@
 main.out: main.o encoder.o
 	gcc main.o encoder.o -lm -o main.out
 
+# debug symbols turned on `-g`, has to be before `-c` compile
 main.o: main.c 
 	gcc -g -c main.c -o main.o
 

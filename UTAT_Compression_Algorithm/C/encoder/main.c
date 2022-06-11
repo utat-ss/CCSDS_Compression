@@ -14,8 +14,8 @@
 #include "encoder.h"
 
 void check_single_encode(void){
-    unsigned int sample = 52;
-    unsigned int k = 4;
+    unsigned int sample = 1234;
+    unsigned int k = 6;
     unsigned int num_bits_used;
     // unsigned int encoded = encode_sample(sample, k);
     unsigned int encoded = encode_sample_optimized(sample, k, &num_bits_used);
@@ -27,7 +27,7 @@ void check_single_encode(void){
 
 
     printf("---- encoding ----\n");
-    printf("sample: decimal = %u, \tbin = "\
+    printf("sample: dec = %u, \tbin = "\
         BYTE_TO_BINARY_PATTERN " " \
         BYTE_TO_BINARY_PATTERN " " \
         BYTE_TO_BINARY_PATTERN " " \
@@ -62,8 +62,8 @@ void check_single_decode(void){
      * sample: decimal = 18,   bin = 00000000 00000000 00000000 00010010,      hex = 12
      * encoded:                bin = 00100010,         hex = 22
      */
-    uint32_t code = 0xe4;
-    unsigned int k = 4;
+    uint32_t code = 0x3ffff92;
+    unsigned int k = 6;
 
     printf("===== decode =====\n");
     printf("code: hex = %X, \tbin = "\
