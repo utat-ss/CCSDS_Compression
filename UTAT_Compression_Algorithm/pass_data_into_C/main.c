@@ -116,19 +116,19 @@ gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
 {
 
     gsl_matrix_view *items = (gsl_matrix_view *)malloc(zlen * sizeof(gsl_matrix_view));
-    for (int i = 0; i < zlen; i++)
+    for (int k = 0; k < zlen; k++)
     {
-        double mat[xlen * ylen];
-        for (int j = 0; j < xlen; j++)
+        double *mat = malloc(xlen * ylen * sizeof(double));
+        for (int i = 0; i < xlen; i++)
         {
-            for (int k = 0; k < ylen; k++)
+            for (int j = 0; j < ylen; j++)
             {
-                mat[j + (k * xlen)] = get_data(arr, xlen, ylen, zlen, i, j, k);
+                mat[(j * xlen) + i] = get_data(arr, xlen, ylen, zlen, i, j, k);
             }
         }
-        gsl_matrix_view gsl_mat = gsl_matrix_view_array(mat, 1, xlen * ylen);
-        items[i] = gsl_mat;
+        items[k] = gsl_matrix_view_array(mat, 1, xlen * ylen);
     }
+
     return items;
 }
 
@@ -178,13 +178,13 @@ int main(int argc, char *argv[])
 
     gsl_matrix_view *dataCube;
     dataCube = parse_into_gsl(data, num_row, num_col, num_depth);
-    gsl_matrix_view mat = dataCube[0];
+    gsl_matrix_view mat = dataCube[3];
 
     for (int row = 0; row < num_row; row++)
     {
         for (int col = 0; col < num_col; col++)
         {
-            printf("\t%3.1f", gsl_matrix_get(&mat.matrix, row, col));
+            printf("\t%3.1f", gsl_matrix_get(&mat.matrix, 0, col * num_row + row));
         }
         printf("\n");
     }
