@@ -6,7 +6,9 @@
  * encoder
  */
 
+#include <stdint.h>
 #include "encoder.h"
+
 
 /**
  * returns the GOP2 code word for an unsigned integer as a char array 
@@ -62,3 +64,65 @@ unsigned int encode_sample(unsigned int sample, unsigned int k){
 	return ret;
 }
 
+uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int* num_bits_used){
+	uint32_t ret;
+	unsigned int M = (int) pow(2,k);
+	unsigned int quotient;
+	unsigned int remainder;
+	unsigned int unary = 0;
+
+	// calculate using bitwise operations
+	quotient = sample >> k;
+	remainder = sample & (M-1);
+
+	// number of bits needed
+	// quotient in unary + 1 for unary stop character + k bits for remainder
+	// 		- actually don't need this since the output is like: 00100010
+	// 		- go by "first 1", that's the start of the sample, stored in 32 bit integer
+	*num_bits_used = quotient + 1 + k;
+
+	// create unary encoding of quotient
+	while (quotient > 0){
+		unary = (unary | 0x1) << 1;	// pad with 1's
+		quotient--;
+	}	
+
+	// combine
+	ret = (unary << k) | remainder;
+
+	return ret;
+}
+
+
+uint32_t decode_sample(uint32_t code, unsigned int k){
+	uint32_t ret;
+	int i = 32; // indexing variable, start at bit 32 (left edge) and work backwards
+	uint32_t quotient = 0; 
+	uint32_t remainder = 0;
+
+	// structure: 0000001111011
+	// 			  ^^^^^^ 		not encoded values, pading
+	// 			        ^^^^^	unary value + stop character 0
+	// 			             ^^ last k bits are remainder 
+
+	// find the leading 1
+	while( (code & (1<<i)) >> i != 1 ){
+		i--;
+	}
+
+	// count number of 1's in unary, until stop character 0
+	while ( (code & (1<<i)) >> i == 1 ){
+		i--;
+		quotient++;
+	}
+
+	// want to extract last k bits
+	// shift all to left, then shift right to pull out leading 0's
+	remainder = code << (32-k);
+	remainder = remainder >> (32-k);
+
+	// combine
+	ret = (int) pow(2,k) * quotient + remainder;
+
+	return ret;
+}

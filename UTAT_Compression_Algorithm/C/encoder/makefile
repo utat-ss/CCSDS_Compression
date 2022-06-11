@@ -1,6 +1,6 @@
 # need to link math library `-lm`
-encoder.out: main.o encoder.o
-	gcc main.o encoder.o -lm -o encoder.out
+main.out: main.o encoder.o
+	gcc main.o encoder.o -lm -o main.out
 
 main.o: main.c 
 	gcc -g -c main.c -o main.o
@@ -18,11 +18,11 @@ clean:
 	rm *.o
 	rm *.out
 
-run: encoder.out
-	./encoder.out
+run: main.out
+	./main.out
 
-debug: encoder.out
-	gdb encoder.out
+debug: main.out
+	gdb main.out
 
 test: test.out
 	./test.out
