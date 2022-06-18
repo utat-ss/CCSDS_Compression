@@ -68,7 +68,6 @@ double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
     // read everything into a flat 1-D array
     // convert this array into a 3D array later
     double *flat_arr = (double *)malloc(sizeof(double) * (*num_row) * (*num_col) * (*num_depth));
-    int count = 0;
 
     // load the rest of the data
     while (feof(fp) != true)
