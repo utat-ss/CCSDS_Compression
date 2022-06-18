@@ -12,8 +12,6 @@ how to pass a file into a c program
 #include <gsl/gsl_matrix.h>
 
 #define MAXCHAR 1000
-#define rows 2
-#define cols 3
 
 /**
  * modified CSV format
@@ -94,7 +92,7 @@ double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
 }
 
 /**
- * given a flat array, get the x,y,z data element
+ * given a flat array, get the x,y,z data element in row-major order
  *
  * don't actually need the zlen, but include it for clarity
  *
@@ -106,9 +104,9 @@ double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
  * o, x, x, x
  * x, x, x, x
  */
-double get_data(double *arr, int xlen, int ylen, int zlen, int x, int y, int z)
+double get_data(double *arr, int row_len, int col_len, int frame_len, int x, int y, int z)
 {
-    return arr[(z * (xlen * ylen)) + (y * xlen) + x];
+    return arr[x * (row_len * col_len) + y * col_len + z];
 }
 
 gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
@@ -152,13 +150,13 @@ int main(int argc, char *argv[])
     }
 
     double *data;
-    int num_row, num_col, num_depth;
+    int num_row, num_col, num_frame;
 
-    data = parse(argv[1], &num_row, &num_col, &num_depth);
+    data = parse(argv[1], &num_row, &num_col, &num_frame);
 
     printf("num_row: %d\n", num_row);
     printf("num_col: %d\n", num_col);
-    printf("num_depth: %d\n", num_depth);
+    printf("num_depth: %d\n", num_frame);
 
     int i = 0;
     int j = 0;
@@ -170,21 +168,21 @@ int main(int argc, char *argv[])
         {
             for (k = 0; k < 3; k++)
             {
-                printf("data[%d][%d][%d]: %f\n", i, j, k, get_data(data, num_row, num_col, num_depth, i, j, k));
+                printf("data[%d][%d][%d]: %f\n", i, j, k, get_data(data, num_row, num_col, num_frame, i, j, k));
             }
         }
     }
 
-    // gsl_matrix_view *dataCube;
-    // dataCube = parse_into_gsl(data, num_row, num_col, num_depth);
-    // gsl_matrix_view mat = dataCube[3];
+    gsl_matrix_view *dataCube;
+    dataCube = parse_into_gsl(data, num_row, num_col, num_frame);
+    gsl_matrix_view mat = dataCube[3];
 
-    // for (int row = 0; row < num_row; row++)
-    // {
-    //     for (int col = 0; col < num_col; col++)
-    //     {
-    //         printf("\t%3.1f", gsl_matrix_get(&mat.matrix, 0, col * num_row + row));
-    //     }
-    //     printf("\n");
-    // }
+    for (int row = 0; row < num_row; row++)
+    {
+        for (int col = 0; col < num_col; col++)
+        {
+            printf("\t%3.1f", gsl_matrix_get(&mat.matrix, 0, col * num_row + row));
+        }
+        printf("\n");
+    }
 }
