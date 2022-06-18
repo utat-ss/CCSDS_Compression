@@ -32,12 +32,12 @@ how to pass a file into a c program
  * returns: 3-D array that is the datacube
  */
 
-double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
+double* parse(char* in_file, int* num_row, int* num_col, int* num_depth)
 {
     // setup variables
-    FILE *fp;
+    FILE* fp;
     char row[MAXCHAR];
-    char *token;
+    char* token;
     int i = 0;
 
     printf("reading from file: %s\n", in_file);
@@ -65,7 +65,7 @@ double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
 
     // read everything into a flat 1-D array
     // convert this array into a 3D array later
-    double *flat_arr = (double *)malloc(sizeof(double) * (*num_row) * (*num_col) * (*num_depth));
+    double* flat_arr = (double *)malloc(sizeof(double) * (*num_row) * (*num_col) * (*num_depth));
 
     // load the rest of the data
     while (feof(fp) != true)
@@ -104,18 +104,18 @@ double *parse(char *in_file, int *num_row, int *num_col, int *num_depth)
  * o, x, x, x
  * x, x, x, x
  */
-double get_data(double *arr, int row_len, int col_len, int frame_len, int x, int y, int z)
+double get_data(double* arr, int row_len, int col_len, int frame_len, int x, int y, int z)
 {
     return arr[x * (row_len * col_len) + y * col_len + z];
 }
-
-gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
+!
+gsl_matrix_view *parse_into_gsl(double* arr, int xlen, int ylen, int zlen)
 {
 
-    gsl_matrix_view *items = (gsl_matrix_view *)malloc(zlen * sizeof(gsl_matrix_view));
+    gsl_matrix_view* items = (gsl_matrix_view *)malloc(zlen * sizeof(gsl_matrix_view));
     for (int k = 0; k < zlen; k++)
     {
-        double *mat = malloc(xlen * ylen * sizeof(double));
+        double* mat = malloc(xlen * ylen * sizeof(double));
         for (int i = 0; i < xlen; i++)
         {
             for (int j = 0; j < ylen; j++)
@@ -134,7 +134,7 @@ gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
  1. input file
  2. output file
 */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     printf("==== start program ====\n");
     printf("Program name %s\n", argv[0]);
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
         printf("Please give 2 arguments.\n");
     }
 
-    double *data;
+    double* data;
     int num_row, num_col, num_frame;
 
     data = parse(argv[1], &num_row, &num_col, &num_frame);
@@ -173,7 +173,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    gsl_matrix_view *dataCube;
+    /
+    gsl_matrix_view* dataCube;
     dataCube = parse_into_gsl(data, num_row, num_col, num_frame);
     gsl_matrix_view mat = dataCube[3];
 
