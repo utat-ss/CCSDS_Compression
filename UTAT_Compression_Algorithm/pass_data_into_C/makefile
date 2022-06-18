@@ -1,5 +1,5 @@
 parse: main.c
-	gcc -g main.c -o parse
+	gcc -g main.c -o parse `gsl-config --cflags --libs`
 
 clean:
 	rm *.o

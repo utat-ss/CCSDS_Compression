@@ -176,16 +176,16 @@ int main(int argc, char *argv[])
         }
     }
 
-    gsl_matrix_view *dataCube;
-    dataCube = parse_into_gsl(data, num_row, num_col, num_depth);
-    gsl_matrix_view mat = dataCube[3];
+    // gsl_matrix_view *dataCube;
+    // dataCube = parse_into_gsl(data, num_row, num_col, num_depth);
+    // gsl_matrix_view mat = dataCube[3];
 
-    for (int row = 0; row < num_row; row++)
-    {
-        for (int col = 0; col < num_col; col++)
-        {
-            printf("\t%3.1f", gsl_matrix_get(&mat.matrix, 0, col * num_row + row));
-        }
-        printf("\n");
-    }
+    // for (int row = 0; row < num_row; row++)
+    // {
+    //     for (int col = 0; col < num_col; col++)
+    //     {
+    //         printf("\t%3.1f", gsl_matrix_get(&mat.matrix, 0, col * num_row + row));
+    //     }
+    //     printf("\n");
+    // }
 }
