@@ -1,19 +1,19 @@
 # need to link math library `-lm`
 main.out: main.o encoder.o
-	gcc main.o encoder.o -lm -o main.out
+	gcc -L/usr/local/lib main.o encoder.o -lgsl -lgslcblas -lm -o main.out
 
 # debug symbols turned on `-g`, has to be before `-c` compile
 main.o: main.c 
-	gcc -g -c main.c -o main.o
+	gcc -Wall -I/usr/local/include -g -c main.c -o main.o
 
 encoder.o: encoder.c encoder.h
-	gcc -g -c encoder.c -o encoder.o
+	gcc -Wall -I/usr/local/include -g -c encoder.c -o encoder.o
 
 test.o: test.c
-	gcc -g -c test.c -o test.o
+	gcc -Wall -I/usr/local/include -g -c test.c -o test.o
 
 test.out: test.o encoder.o
-	gcc test.o encoder.o -lm -o test.out
+	gcc -L/usr/local/lib test.o encoder.o -lgsl -lgslcblas -lm -o test.out
 
 clean:
 	rm *.o
