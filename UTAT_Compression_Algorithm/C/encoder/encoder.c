@@ -101,7 +101,7 @@ uint32_t decode_sample(uint32_t code, unsigned int k){
 	uint32_t remainder = 0;
 
 	// structure: 0000001111011
-	// 			  ^^^^^^ 		not encoded values, pading
+	// 			  ^^^^^^ 		not encoded values, padding
 	// 			        ^^^^^	unary value + stop character 0
 	// 			             ^^ last k bits are remainder 
 
