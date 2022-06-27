@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 #include "header.h"
 
 /*
@@ -52,7 +53,7 @@ uint16_t decode_bitstream(uint64_t* bitstream, uint16_t size, uint8_t width)
 }
 
 /*
-Encodes Image Metadata into bitstream. Required the total number of bytes to be known. 
+Encodes Image Metadata into bitstream and writes to bin file. Requires the total number of bytes to be known. 
 Inputs:
     params:     Pointer to struct holding all necessary Image Metadata values to be encoded
     size:       Total number of 64 bit variables (Number of bytes / 4) needed to encode Image Metadata values
@@ -62,7 +63,7 @@ Output:
 uint64_t* encodeimageMetadata(imageMetadata* params, uint16_t size)
 {
     uint16_t* cursor = (uint16_t*) params;
-    uint64_t* bitstream = calloc(3, sizeof(uint64_t));
+    uint64_t* bitstream = calloc(size + 1, sizeof(uint64_t));
     for(int i = 0; i <= 12; ++i)
     {
         //printf("%d\n", *(cursor + i));
@@ -70,20 +71,50 @@ uint64_t* encodeimageMetadata(imageMetadata* params, uint16_t size)
         //printf("%llx %llx %llx\n",bitstream[2], bitstream[1], bitstream[0]);
     }
     printf("%016llx %016llx %016llx\n",bitstream[2], bitstream[1], bitstream[0]);
+    
+    //Write bitstream to bin file
+    FILE *fptr;
+    fptr = fopen("output/encoded.bin","wb");  // w for write, b for binary
+    fwrite(bitstream, size, 8, fptr);
+    fclose(fptr);
+    
+    return bitstream;
+}
+
+/*
+Reads bitstream from bin file and populates empty Image Metadata struct.
+Inputs:
+    params:     Emtpy Image Metadata struct
+    size:       otal number of 64 bit variables (Number of bytes / 4) used to encode Image Metadata values
+Output:
+    N/A
+*/
+void decodeImageMetadata(imageMetadata* params, uint16_t size)
+{
+    //Read bitstream from bin file
+    uint64_t* bitstream = calloc(size + 1, sizeof(uint64_t));
+    FILE *fptr;
+    fptr = fopen("output/encoded.bin", "rb");
+    fread(bitstream, size, 8, fptr);
+    fclose(fptr);
+
+    printf("%016llx %016llx %016llx\n",bitstream[2], bitstream[1], bitstream[0]);
+    
+    uint16_t* cursor = (uint16_t*) params;
+    
     for(int i = 12; i >= 0; --i)
     {
         //printf("%d\n", *(cursor + i));
         uint16_t value = decode_bitstream(bitstream, 3, imageMetadataWidths[i]);
-        //printf("%016llx %016llx %016llx\n",bitstream[2], bitstream[1], bitstream[0]);
-        printf("Grabbed: %hu\n", value);
+        //printf("Grabbed: %hu\n", value);
+        *(cursor + i) = value;
     }
-    return bitstream;
 }
-
 
 int main(void)
 {
     //Create test imageMetadata
+    printf("==== Image Metadata Test Unit ====\n");
     imageMetadata* params = calloc(sizeof(imageMetadata), 1);
 
     params->userDefined = 1;
@@ -104,7 +135,14 @@ int main(void)
 
     params->supplementaryInformationTableCount = 15; //Only 4 bits used
 
-    encodeimageMetadata(params);
+    uint64_t* data = encodeimageMetadata(params, 3);
+    //printf("%016llx %016llx %016llx\n",data[2], data[1], data[0]);
+    imageMetadata* params_empty = calloc(sizeof(imageMetadata), 1);
+    decodeImageMetadata(params_empty, 3);
+    if(memcmp(params_empty, params, 26) == 0)
+        printf("Passed!\n");
+    else
+        printf("Failed!\n");
 
     return 0;
 }
