@@ -22,7 +22,6 @@
   (byte & 0x04 ? '1' : '0'), \
   (byte & 0x02 ? '1' : '0'), \
   (byte & 0x01 ? '1' : '0') 
-
   
 // Yong Da's naive implementation
 unsigned int encode_sample(unsigned int sample, unsigned int k);
