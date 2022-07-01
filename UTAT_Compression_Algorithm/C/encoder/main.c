@@ -79,9 +79,9 @@ void pretty_save_matrix(gsl_matrix_int* matrix, char* filepath){
 
 
 void check_single_encode(void){
-    unsigned int sample = 324;
-    unsigned int k = 7;
-    unsigned int num_bits_used;
+    unsigned int sample = 19;
+    unsigned int k = 5;
+    unsigned int num_bits_used; 
     // unsigned int encoded = encode_sample(sample, k);
     unsigned int encoded = encode_sample_optimized(sample, k, &num_bits_used);
 
@@ -89,6 +89,7 @@ void check_single_encode(void){
     printf("---- parameters ----\n");
     printf("Golomb power of 2 [k]: %u\n", k);
     printf("divisor [M]: %u\n", (unsigned int) pow(2,k));
+    printf("sample: %u\n", sample);
 
 
     printf("---- encoding ----\n");
@@ -174,7 +175,8 @@ void check_multiple_encode(int nrow, int ncol, int range, int k){
         for(j=0; j<ncol; j++){
             sample = gsl_matrix_int_get(matrix, i, j);
             code = encode_sample_optimized(sample, k, &num_bits_used);
-            //  printf("(%d, %d): sample=%d, code=%x\n", i, j, sample, code);
+            printf("(%d, %d): sample=%3d | code=%3x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
+            print_binary_32(code);
             BitFilePutBits(bOutFile, &code, num_bits_used);
         }
     }
@@ -204,8 +206,6 @@ void check_multiple_encode(int nrow, int ncol, int range, int k){
  *
  * but the split happened manually, cuz I knew the correct input
  */
-
-
 void check_multiple_decode(int nrow, int ncol, int k){
     printf("==== muliple decode ====\n");
 
@@ -223,8 +223,8 @@ int main(void){
     // check_single_decode();
     // check_read_write_to_binary_file();
     
-    int nrow = 10;
-    int ncol = 10;
+    int nrow = 1;
+    int ncol = 5;
     int range = 100;
     int k = 5;
     check_multiple_encode(nrow, ncol, range, k);

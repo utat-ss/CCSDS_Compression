@@ -79,7 +79,12 @@ uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int* 
 	// quotient in unary + 1 for unary stop character + k bits for remainder
 	// 		- actually don't need this since the output is like: 00100010
 	// 		- go by "first 1", that's the start of the sample, stored in 32 bit integer
-	*num_bits_used = quotient + 1 + k;
+	if (quotient > 0){
+		*num_bits_used = quotient + 1 + k;
+	}
+	else{	// if don't need unary portion, then just use k bits
+		*num_bits_used = k;
+	}
 
 	// create unary encoding of quotient
 	while (quotient > 0){
