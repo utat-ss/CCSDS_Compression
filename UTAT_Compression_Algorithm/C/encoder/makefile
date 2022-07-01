@@ -1,29 +1,36 @@
-# need to link math library `-lm`
-main.out: main.o encoder.o
-	gcc -L/usr/local/lib main.o encoder.o -lgsl -lgslcblas -lm -o main.out
+CC = gcc	# compiler
+LD = gcc	# linker
+CFLAGS = -Wall -I/usr/local/include -g -c	# compiler flags
+LDFLAGS = -o	# linker flags
+LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
 
-# debug symbols turned on `-g`, has to be before `-c` compile
-main.o: main.c 
-	gcc -Wall -I/usr/local/include -g -c main.c -o main.o
+all: main.out test.out
 
-encoder.o: encoder.c encoder.h
-	gcc -Wall -I/usr/local/include -g -c encoder.c -o encoder.o
+main.out: main.o encoder.o bitfile/libbitfile.a
+	$(LD) $^ $(LIBS) $(LDFLAGS) $@
 
-test.o: test.c
-	gcc -Wall -I/usr/local/include -g -c test.c -o test.o
+test.out: test.o encoder.o bitfile/libbitfile.a
+	$(LD) $^ $(LIBS) $(LDFLAGS) $@
 
-test.out: test.o encoder.o
-	gcc -L/usr/local/lib test.o encoder.o -lgsl -lgslcblas -lm -o test.out
+main.o: main.c bitfile/bitfile.h
+	$(CC) $(CFLAGS) $< 
+
+encoder.o: encoder.c encoder.h bitfile/bitfile.h
+	$(CC) $(CFLAGS) $< 
+
+bitfile/libbitfile.a:
+	cd bitfile && $(MAKE) libbitfile.a
 
 clean:
-	rm *.o
-	rm *.out
+	rm -f *.o
+	rm -f *.out
+	cd bitfile && $(MAKE) clean
 
 run: main.out
-	./main.out
+	./$<
 
 debug: main.out
-	gdb main.out
+	gdb $<
 
 test: test.out
-	./test.out
+	./$<
