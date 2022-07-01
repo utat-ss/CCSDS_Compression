@@ -16,4 +16,19 @@
 void check_single_encode(void);
 void check_single_decode(void);
 
+
+void print_binary_32(uint32_t word){
+    printf("word: hex = %X, \tbin = "\
+        BYTE_TO_BINARY_PATTERN " " \
+        BYTE_TO_BINARY_PATTERN " " \
+        BYTE_TO_BINARY_PATTERN " " \
+        BYTE_TO_BINARY_PATTERN \
+        ", \thex = %x\n", word, \
+        BYTE_TO_BINARY(word>>24), \
+        BYTE_TO_BINARY(word>>16), \
+        BYTE_TO_BINARY(word>>8), \
+        BYTE_TO_BINARY(word), word);  
+}
+
+
 #endif // MAIN_H
