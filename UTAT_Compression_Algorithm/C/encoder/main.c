@@ -152,7 +152,7 @@ void check_read_write_to_binary_file(void){
 }
 
 void check_multiple_encode(int nrow, int ncol, int range, int k){
-    printf("==== muliple encode ====\n");
+    printf("==== multiple encode ====\n");
 
     // setup gsl matrix with random data
     gsl_matrix_int *matrix = init_gsl_matrix(nrow, ncol, range);
@@ -178,6 +178,18 @@ void check_multiple_encode(int nrow, int ncol, int range, int k){
             printf("(%d, %d): sample=%3d | code=%3x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
             print_binary_32(code);
             BitFilePutBits(bOutFile, &code, num_bits_used);
+
+            /**
+             * TODO: Thursday, June 30, 2022
+             * BitFilePutBits() doesn't work as expected
+             * ex. it writes out bytes (2143)
+             *     you expect it to write out in (1234)
+             *     1,2,3,4 = 8-bit blocks, in the order that you call BitFilePutBits()
+             *     () = 1 byte = 4 * 8-bit blocks
+             *
+             * test parameter, RNG range in 0-255, use k=8 --> divisor=256
+             * therefore guarantee no unary portion and only 8 num_bits_used,
+             */
         }
     }
 
@@ -225,8 +237,8 @@ int main(void){
     
     int nrow = 1;
     int ncol = 5;
-    int range = 100;
-    int k = 5;
+    int range = (int)pow(2,8);
+    int k = 8;
     check_multiple_encode(nrow, ncol, range, k);
     // check_multiple_decode(nrow, ncol, k);
     

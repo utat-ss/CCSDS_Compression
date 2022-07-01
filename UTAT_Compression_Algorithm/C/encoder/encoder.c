@@ -109,6 +109,16 @@ uint32_t decode_sample(uint32_t code, unsigned int k){
 	// 			  ^^^^^^ 		not encoded values, padding
 	// 			        ^^^^^	unary value + stop character 0
 	// 			             ^^ last k bits are remainder 
+	
+	/**
+	 * TODO: Thursday, June 30, 2022
+	 * doesn't account for the case where there is no unary
+	 * aka it goes directly into truncated binary
+	 * ex. sample = 28, k=5 --> divisor = 32
+	 * 	encoded = no unary + bin(28) = 0b11100
+	 * 	notice binary is 5 bit long representation (same as k)
+	 * 	
+	 */
 
 	// find the leading 1
 	while( (code & (1<<i)) >> i != 1 ){
