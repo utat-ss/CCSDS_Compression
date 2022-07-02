@@ -12,7 +12,7 @@ main.out: main.o encoder.o bitfile/libbitfile.a
 test.out: test.o encoder.o bitfile/libbitfile.a
 	$(LD) $^ $(LIBS) $(LDFLAGS) $@
 
-main.o: main.c bitfile/bitfile.h bitfile/bitfile.c
+main.o: main.c main.h bitfile/bitfile.h bitfile/bitfile.c
 	$(CC) $(CFLAGS) $< 
 
 encoder.o: encoder.c encoder.h bitfile/bitfile.h bitfile/bitfile.c
