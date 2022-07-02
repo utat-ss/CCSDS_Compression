@@ -2,9 +2,10 @@
 This file implements helper functions used in the compression and
 decompression steps.
 */
+#include "helperlib.h"
 
 // Returns the sign of an integer, with 0 returned as a positive
-int sign(int x)
+int sign(double x)
 {
     if (x >= 0)
     {
@@ -16,9 +17,9 @@ int sign(int x)
     }
 }
 
-int clamp(int x, int min, int max)
+double clamp(double x, double min, double max)
 {
-    int result = x;
+    double result = x;
     if (x < min)
     {
         result = min;
@@ -27,5 +28,6 @@ int clamp(int x, int min, int max)
     {
         result = max;
     }
+
     return result;
 }

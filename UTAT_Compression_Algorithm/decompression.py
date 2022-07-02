@@ -25,6 +25,9 @@ def decode(encoded, Nz, Nx, Ny):
     i = 0
     q = 0
     t = 0 #Keep track of position for re-setting accumulator
+    # section 3.4 of CCSD123, t = y*Ny + x (aka the index in the single frame/matrix)
+    # used: 5.4.3.2 Sample-Adaptive Entropy Coder
+
     while i < len(encoded):
         
         if (t>=(Nx*Ny)):

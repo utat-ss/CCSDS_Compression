@@ -5,7 +5,7 @@
 import numpy as np
 import helperlib
 #User-defined constants for predictor 
-dynamic_range = 32 #user-specified parameter between 2 and 32
+dynamic_range = 16 #user-specified parameter between 2 and 32
 s_min = -1*(2**(dynamic_range-1))
 s_max = 2**(dynamic_range-1)
 s_mid = 0
@@ -15,7 +15,7 @@ damping = 0 #Any integer value from 0 to 2^resolution - 1
 offset = 0 #any integer value from 0 to 2^resolution -1
 max_error = 0 #Max error is an array for each pixel in the image, but for now is used as a single variable
 number_of_bands = 2 #user-defined parameter between 0 and 15 that indicates that number of previous bands used for prediction
-register_size = 50 #user-defined parameter from max{32, 2^(D+weight_resolution+1)} to 64
+register_size = 32 #user-defined parameter from max{32, 2^(D+weight_resolution+1)} to 64
 v_min = -6 #vmin and vmax are user-defined parameters that control the rate at which the algorithm adapts to data statistics
 v_max = 9 # -6 <= v_min < v_max <= 9
 t_inc = 2**4 #parameter from 2^4 to 2^11
@@ -177,7 +177,7 @@ def prediction_calculation(ld_vector, weight_vector, local_sum, t, x, y, z, data
     pred_sample_value = np.floor(dr_sample_value/2)
 
     #The difference between the actual value and the predicted value is calculated
-    pred_residual = data[z,y,x] - pred_sample_value
+    pred_residual = data - pred_sample_value
    
     #Both the predicted and dr predicted sample value are returned - latter is used in updating the weight vector
     return pred_sample_value, pred_residual, dr_sample_value
@@ -189,7 +189,7 @@ def weight_update(dr_sample_value, predicted_sample, predicted_residual, t, Nx, 
 
     #Prediction error is calculated using equation 49
     prediction_error = 2*clipped_quant - dr_sample_value
-
+    
     #Next, the weight update scaling exponent is calculated, using user parameters of t_inc, v_min, and v_max (Equation 50)
     temp_1 = v_min + np.floor((t-Nx)/t_inc)
     weight_exponent = np.clip(temp_1, v_min, v_max) + dynamic_range - weight_resolution

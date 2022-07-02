@@ -29,9 +29,9 @@ from sklearn.metrics import mean_squared_error
 
 
 data_one = [[
-    [6, 4, 2],
-    [7, 8, 0],
-    [4, 8, 5]],
+    [1, 1, 1],
+    [2, 2, 2],
+    [3, 3, 3]],
 
     [[1, 2, 2],
      [6, 1, 6],
@@ -377,5 +377,8 @@ def get_metrics(file_name, data_header, subset_size=100):
     print("RMSE: ", rms)
     print("Compression ratio: ", compression_ratio)
 
-
+'''
 get_metrics("images/Indian_pines.mat", "indian_pines")
+print(dec_to_bin(52, 8))
+'''
+

@@ -1,8 +1,8 @@
 #ifndef HELPERLIB
 #define HELPERLIB
 
-//helper functions
-int sign(int x);
-int clamp(int x, int min, int max);
+// helper functions
+int sign(double x);
+double clamp(double x, double min, double max);
 
 #endif
