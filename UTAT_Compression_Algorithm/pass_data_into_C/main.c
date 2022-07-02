@@ -109,10 +109,10 @@ double get_data(double *arr, int row_len, int col_len, int frame_len, int x, int
     return arr[x * (row_len * col_len) + y * col_len + z];
 }
 
-gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
+gsl_matrix *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
 {
 
-    gsl_matrix_view *items = (gsl_matrix_view *)malloc(zlen * sizeof(gsl_matrix_view));
+    gsl_matrix *items = (gsl_matrix_view *)malloc(zlen * sizeof(gsl_matrix_view));
     for (int k = 0; k < zlen; k++)
     {
         double *mat = malloc(xlen * ylen * sizeof(double));
@@ -123,7 +123,7 @@ gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
                 mat[(j * xlen) + i] = get_data(arr, xlen, ylen, zlen, i, j, k);
             }
         }
-        items[k] = gsl_matrix_view_array(mat, 1, xlen * ylen);
+        items[k] = gsl_matrix_view_array(mat, 1, xlen * ylen).matrix;
     }
 
     return items;
@@ -134,7 +134,7 @@ gsl_matrix_view *parse_into_gsl(double *arr, int xlen, int ylen, int zlen)
  1. input file
  2. output file
 */
-int main(int argc, char *argv[])
+gsl_matrix *main(int argc, char *argv[])
 {
     printf("==== start program ====\n");
     printf("Program name %s\n", argv[0]);
@@ -173,16 +173,18 @@ int main(int argc, char *argv[])
         }
     }
 
-    gsl_matrix_view *dataCube;
+    gsl_matrix *dataCube;
     dataCube = parse_into_gsl(data, num_row, num_col, num_frame);
-    gsl_matrix_view mat = dataCube[3];
+    gsl_matrix mat = dataCube[3];
 
     for (int row = 0; row < num_row; row++)
     {
         for (int col = 0; col < num_col; col++)
         {
-            printf("\t%3.1f", gsl_matrix_get(&mat.matrix, 0, col * num_row + row));
+            printf("\t%3.1f", gsl_matrix_get(&mat, 0, col * num_row + row));
         }
         printf("\n");
     }
+
+    return dataCube;
 }
