@@ -15,7 +15,7 @@
  * @param num_frame
  * @return gsl_matrix*
  */
-gsl_matrix *parse(char *in_file, int *num_row, int *num_col, int *num_frame)
+gsl_matrix **parse(char *in_file, int *num_row, int *num_col, int *num_frame)
 {
     // setup variables
     FILE *fp;
@@ -46,51 +46,45 @@ gsl_matrix *parse(char *in_file, int *num_row, int *num_col, int *num_frame)
         break;
     }
 
-    /*int pixels_per_frame = (*num_col) * (*num_row);
+    int pixels_per_frame = (*num_col) * (*num_row);
     int k = 0;
 
     // allocate return array of GSL matrices
-    gsl_matrix *items = (gsl_matrix_view *)malloc((*num_frame) * sizeof(gsl_matrix_view));
+    gsl_matrix **items = malloc((*num_frame) * sizeof(gsl_matrix *));
+    for (int k = 0; k < *num_frame; k++)
+    {
+        items[k] = gsl_matrix_alloc(1, pixels_per_frame);
+    }
 
-    */
     // allocate temporary array that will be filled with each frame's values
-    double *flat_arr = (double *)malloc(sizeof(double) * (*num_row) * (*num_col) * (*num_frame));
+    double *flat_arr = malloc(sizeof(double) * (*num_row) * (*num_col));
 
     while (feof(fp) != true)
     {
-        // When a new frame is reached, reset array
 
+        // Retrieve next row and split it up by commas
         fgets(row, MAXCHAR, fp);
-        // printf("Row: %s\n", row);
-
         token = strtok(row, ",");
 
+        // extract each pixel value
         while (token != NULL)
         {
-            // printf("Token: %s \ti: %d\n", token, i);
             flat_arr[i] = atoi(token);
             token = strtok(NULL, ",");
             i++;
         }
 
-        /* if (i % pixels_per_frame == 0)
+        // When a new frame is reached, reset array
+        if (i % pixels_per_frame == 0)
         {
             i = 0;
-            // items[k] = malloc(sizeof(gsl_matrix));
-            gsl_matrix_view temp = gsl_matrix_view_array(flat_arr, 1, (*num_row) * (*num_col));
-            items[k] = temp.matrix;
-            if (k > 0)
-            {
-                printf("%lf \n", gsl_matrix_get(&items[k - 1], 0, 0));
-            }
+            gsl_matrix temp = gsl_matrix_view_array(flat_arr, 1, (*num_row) * (*num_col)).matrix;
+            gsl_matrix_memcpy(items[k], &temp);
             k++;
-        } */
+        }
     }
 
-    gsl_matrix *dataCube;
-    dataCube = parse_into_gsl(flat_arr, *num_row, *num_col, *num_frame);
-
-    return dataCube;
+    return items;
 }
 
 /**
