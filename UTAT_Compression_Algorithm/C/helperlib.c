@@ -1,5 +1,3 @@
-
-
 /*
 This file implements helper functions used in the compression and
 decompression steps.

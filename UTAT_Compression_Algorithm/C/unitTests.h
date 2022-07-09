@@ -2,7 +2,6 @@
 #define UNITTESTS
 
 #include <gsl/gsl_vector.h>
-#include "dataCube.h"
 #include "compression.h"
 
 void testPredictionCalculation(double data, double localSum, int t, int z, int Nz, gsl_vector *local_d);
