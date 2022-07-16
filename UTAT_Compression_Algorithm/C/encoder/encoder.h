@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bitfile/bitfile.h"
+
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \
   (byte & 0x80 ? '1' : '0'), \
@@ -44,5 +46,13 @@ uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int* 
  * @return      [decoded 32-bit unsigned sample]
  */
 uint32_t decode_sample(uint32_t code, unsigned int k);
+
+/**
+ * decodes a file bit-by-bit, returning each complete code
+ * @param  stream [bitfile stream, will be read continually]
+ * @param  k      [control parameter for size of divisor]
+ * @return        [decoded sample, held in a unsigned 32-bit int container]
+ */
+uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k);
 
 #endif // ENCODER_H

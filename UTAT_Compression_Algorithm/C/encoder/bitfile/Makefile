@@ -5,7 +5,8 @@
 
 CC = gcc
 LD = gcc
-CFLAGS = -O2 -Wall -Wextra -ansi -pedantic -c
+# CFLAGS = -O2 -Wall -Wextra -ansi -pedantic -c
+CFLAGS = -O2 -Wall -Wextra -c
 LDFLAGS = -O2 -o
 
 # libraries
@@ -24,24 +25,24 @@ else	#assume Linux/Unix
 	DEL = rm -f
 endif
 
-all:	sample$(EXE)
+# all:	sample$(EXE)
 
-sample$(EXE):	sample.o libbitfile.a
-	$(LD) $< $(LIBS) $(LDFLAGS) $@
+# sample$(EXE):	sample.o libbitfile.a
+# 	$(LD) $< $(LIBS) $(LDFLAGS) $@
 
-sample.o:	sample.c bitfile.h
-	$(CC) $(CFLAGS) $<
+# sample.o:	sample.c bitfile.h
+# 	$(CC) $(CFLAGS) $<
 
-libbitfile.a:	bitfile.o
-	ar crv libbitfile.a bitfile.o
-	ranlib libbitfile.a
+# libbitfile.a:	bitfile.o
+# 	ar crv libbitfile.a bitfile.o
+# 	ranlib libbitfile.a
 
 bitfile.o:	bitfile.c bitfile.h
 	$(CC) $(CFLAGS) $<
 
-docs:		doxygen.conf bitfile.c bitfile.h sample.c
-		rm -rf docs
-		doxygen $<
+# docs:		doxygen.conf bitfile.c bitfile.h sample.c
+# 		rm -rf docs
+# 		doxygen $<
 
 clean:
 	$(DEL) *.o

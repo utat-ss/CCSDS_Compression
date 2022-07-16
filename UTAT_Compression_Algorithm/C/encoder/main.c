@@ -151,7 +151,7 @@ void check_read_write_to_binary_file(void){
     fclose(fptr);
 }
 
-void check_multiple_encode(int nrow, int ncol, int range, int k){
+void encode_rng_gsl_matrix(int nrow, int ncol, int range, int k){
     printf("==== multiple encode ====\n");
 
     // setup gsl matrix with random data
@@ -170,25 +170,45 @@ void check_multiple_encode(int nrow, int ncol, int range, int k){
     bOutFile = MakeBitFile(outFile, BF_WRITE);
 
     int i, j;
+    int bit = 0;
+    int counter = 0;
     uint32_t sample, code;
     for(i=0; i<nrow; i++){
         for(j=0; j<ncol; j++){
             sample = gsl_matrix_int_get(matrix, i, j);
             code = encode_sample_optimized(sample, k, &num_bits_used);
-            printf("(%d, %d): sample=%3d | code=%3x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
+            // printf("DEBUG: (%d, %d): sample=%3d | code=%3x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
             print_binary_32(code);
+
+            /* put bits (plural) is giving weird padding issue, trying to use singular
             BitFilePutBits(bOutFile, &code, num_bits_used);
+            */
+           
+            // printf("DEBUG: writing: ");
+            while (counter < num_bits_used){
+                bit = (code >> (num_bits_used - 1 - counter)) & 0x1;
+                if (bit == 1){
+                    // printf("1");
+                    BitFilePutBit(1, bOutFile);
+                }
+                else{
+                    // printf("0");
+                    BitFilePutBit(0, bOutFile);
+                }
+
+                counter++;  // increment counter
+            }
+            printf("\n");
+            counter = 0;    // reset counter
 
             /**
-             * TODO: Thursday, June 30, 2022
-             * BitFilePutBits() doesn't work as expected
-             * ex. it writes out bytes (2143)
-             *     you expect it to write out in (1234)
-             *     1,2,3,4 = 8-bit blocks, in the order that you call BitFilePutBits()
-             *     () = 1 byte = 4 * 8-bit blocks
+             * Saturday, July 9, 2022
+             * DON'T USE `hexdump` to view it
+             * If the bytes on disk are (1234), hexdump will display it like (2143)
+             * 1,2,3,4 = 8-bit blocks
+             * () = 1 byte = 4 * 8-bit blocks
              *
-             * test parameter, RNG range in 0-255, use k=8 --> divisor=256
-             * therefore guarantee no unary portion and only 8 num_bits_used,
+             * instead, use view_binary_file() to print it out using C
              */
         }
     }
@@ -196,51 +216,95 @@ void check_multiple_encode(int nrow, int ncol, int range, int k){
     /* pad fill with 1s so decode will run into EOF */
     BitFileFlushOutput(bOutFile, 1);
 
+    fclose(outFile);
     gsl_matrix_int_free(matrix);
 }
 
 
-/**
- * TODO: Thursday, June 30, 2022
- * multiple encode is manually checked to be correct
- * but when decoding, no idea when the truncated binary portion ends
- * and the unary part begins for the next character
- *
- * ex. 0xdec2 --> 0b1101111011000010
- * samples: 94  66  60  94  30  81 ...
- * k = 5 --> divisor = 32
- *
- * 0b11011110 11000010
- * 94 = 2*32 + 30
- *    = 110 + 11110
- * 66 = 2*32 + 2
- *    = 110 + 00010
- *
- * but the split happened manually, cuz I knew the correct input
- */
-void check_multiple_decode(int nrow, int ncol, int k){
-    printf("==== muliple decode ====\n");
+void check_multiple_decode(char* filename, int k, uint32_t* decoded_array, uint32_t decoded_size){
+    uint32_t i = 0;
+    uint32_t decoded;
 
-    // setup bitfile
-    FILE *inFile;
-    inFile = fopen("output/encoded.bin", "rb");
+    printf("==== multiple decode ====\n");
+    bit_file_t *bfp;
 
-    bit_file_t *bInFile;               /* decoded input */
-    bInFile = MakeBitFile(inFile, BF_READ);
+    printf("==== reading file using bitfile: %s ===\n", filename);
+    bfp = BitFileOpen(filename, BF_READ);
+
+
+    while(i<decoded_size){
+        decoded = decode_sample_bitfile(bfp, (unsigned int) k);
+        decoded_array[i] = decoded;
+        printf("DEBUG: decoded[%2d]=%3d\n", i, decoded_array[i]);
+
+        i++;
+    }
+
+    BitFileClose(bfp);
 
 }
+
+
+void view_binary_file(char* filename){
+   int c;
+   FILE *fp;
+   printf("==== reading file: %s ===\n", filename);
+   fp = fopen(filename,"r");
+   while(1) {
+      c = fgetc(fp);
+      if( feof(fp) ) {
+         break ;
+      }
+      printf("%x", c);
+   }
+   fclose(fp);
+
+   printf("\n==== end file ===\n");
+}
+
+
+void view_binary_file_using_bitfile(char* filename){
+    uint32_t i = 0;
+    bit_file_t *bfp;
+    int value;
+
+    printf("==== reading file using bitfile: %s ===\n", filename);
+    bfp = BitFileOpen(filename, BF_READ);
+
+    // read until end of file
+    while(1){
+        value = BitFileGetBit(bfp);
+        if (value == EOF){  // end of file
+            printf("end of file\n");
+            return;
+        }
+        else{
+            printf("read bit [%2d] = %d\n", i, value);
+        }
+        i++; 
+    }
+    printf("\n==== end bitfile ===\n");
+    BitFileClose(bfp);
+}
+
 
 int main(void){
     // check_single_encode();
     // check_single_decode();
     // check_read_write_to_binary_file();
     
-    int nrow = 1;
-    int ncol = 5;
-    int range = (int)pow(2,8);
-    int k = 8;
-    check_multiple_encode(nrow, ncol, range, k);
-    // check_multiple_decode(nrow, ncol, k);
+    int nrow = 16*16;
+    int ncol = 16;
+    int range = (int)pow(2,16);
+    // int range = 100;
+    int k = 14;
+    encode_rng_gsl_matrix(nrow, ncol, range, k);
+    view_binary_file("output/encoded.bin");
+    // view_binary_file_using_bitfile("output/encoded.bin");
+
+    // decode
+    uint32_t* decoded_array = (uint32_t*) malloc(sizeof(uint32_t) * nrow*ncol);
+    check_multiple_decode("output/encoded.bin", k, decoded_array, nrow*ncol);
     
     return 0;
 }

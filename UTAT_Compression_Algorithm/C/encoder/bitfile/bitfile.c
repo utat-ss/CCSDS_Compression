@@ -691,11 +691,13 @@ int BitFilePutBit(const int c, bit_file_t *stream)
     }
 
     stream->bitCount++;
-    stream->bitBuffer <<= 1;
+    stream->bitBuffer <<= 1; // default
+    // stream->bitBuffer = stream->bitBuffer>>1; // Yong Da messing around
 
     if (c != 0)
     {
-        stream->bitBuffer |= 1;
+        stream->bitBuffer |= 1; // default
+        // stream->bitBuffer = (stream->bitBuffer) | 0x1<<8; // Yong Da messing around
     }
 
     /* write bit buffer if we have 8 bits */
@@ -857,7 +859,8 @@ int BitFilePutBits(bit_file_t *stream, void *bits, const unsigned int count)
 
         while (remaining > 0)
         {
-            returnValue = BitFilePutBit((tmp & 0x80), stream);
+            returnValue = BitFilePutBit((tmp & 0x80), stream);  // default
+            // returnValue = BitFilePutBit((tmp & 0x08), stream);   // Yong Da messing around
 
             if (returnValue == EOF)
             {

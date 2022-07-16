@@ -2,14 +2,15 @@ CC = gcc	# compiler
 LD = gcc	# linker
 CFLAGS = -Wall -I/usr/local/include -g -c	# compiler flags
 LDFLAGS = -o	# linker flags
-LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
+# LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
+LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm
 
 all: main.out test.out
 
-main.out: main.o encoder.o bitfile/libbitfile.a
+main.out: main.o encoder.o bitfile/bitfile.o
 	$(LD) $^ $(LIBS) $(LDFLAGS) $@
 
-test.out: test.o encoder.o bitfile/libbitfile.a
+test.out: test.o encoder.o bitfile/bitfile.o
 	$(LD) $^ $(LIBS) $(LDFLAGS) $@
 
 main.o: main.c main.h bitfile/bitfile.h bitfile/bitfile.c
@@ -18,8 +19,8 @@ main.o: main.c main.h bitfile/bitfile.h bitfile/bitfile.c
 encoder.o: encoder.c encoder.h bitfile/bitfile.h bitfile/bitfile.c
 	$(CC) $(CFLAGS) $< 
 
-bitfile/libbitfile.a:
-	cd bitfile && $(MAKE) libbitfile.a
+bitfile/bitfile.o: bitfile/bitfile.c bitfile/bitfile.h
+	cd bitfile && $(MAKE) bitfile.o
 
 clean:
 	rm -f *.o

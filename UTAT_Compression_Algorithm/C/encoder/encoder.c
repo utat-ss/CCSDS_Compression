@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include "encoder.h"
+#include <math.h>
 
 
 /**
@@ -79,11 +80,17 @@ uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int* 
 	// quotient in unary + 1 for unary stop character + k bits for remainder
 	// 		- actually don't need this since the output is like: 00100010
 	// 		- go by "first 1", that's the start of the sample, stored in 32 bit integer
+	 /**
+	  * number of bits used
+	  * - always +1 for the 0 stop character (0, 10, 110, 1110, etc)
+	  * - +quotient for the unary portion
+	  * - +k for the remainder
+	  */
 	if (quotient > 0){
 		*num_bits_used = quotient + 1 + k;
 	}
-	else{	// if don't need unary portion, then just use k bits
-		*num_bits_used = k;
+	else{	// if don't need unary portion, then just use k bits, always plus stop character
+		*num_bits_used = k+1;
 	}
 
 	// create unary encoding of quotient
@@ -140,4 +147,50 @@ uint32_t decode_sample(uint32_t code, unsigned int k){
 	ret = (int) pow(2,k) * quotient + remainder;
 
 	return ret;
+}
+
+
+uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k){
+	uint32_t decoded = 0;
+	uint32_t c;
+	uint32_t i = 0;
+	uint32_t unary_count = 0;
+	uint32_t truncated_binary = 0;
+
+	c = BitFileGetBit(stream);
+	// printf("DEBUG: first character=%d\n", c);
+
+
+	// assume unary portion first
+	if (c == 0){	// if first entry is 0, then the next k bits are the truncated binary
+		// printf("DEBUG: no unary portion, only truncated binary\n");
+		for (i=0; i<k; i++){
+			truncated_binary = truncated_binary | (c << (k-i));	// add in backwards order, since reading bits in backwards order
+			c = BitFileGetBit(stream);	// get next bit
+		}
+		truncated_binary = truncated_binary | (c << (k-i));	// need to do it for the last bit
+
+		// printf("DEBUG: finished truncated binary only = %3d\n", truncated_binary);
+	}
+	else {
+		// printf("DEBUG: unary and truncated binary\n");
+		// read the unary portion, count number of 1's
+		while (c == 1){
+			unary_count++;
+			c = BitFileGetBit(stream);
+		}
+
+		// then read the truncated binary portion
+		for (i=0; i<k; i++){
+			truncated_binary = truncated_binary | (c << (k-i));	// add in backwards order, since reading bits in backwards order
+			c = BitFileGetBit(stream);	// get next bit
+		}
+		truncated_binary = truncated_binary | (c << (k-i));	// need to do it for the last bit
+	}
+
+	// calculate value
+	// printf("DEBUG: unary_count = %3d\n", unary_count);
+	decoded = pow(2,k)*unary_count + truncated_binary;
+
+	return decoded;
 }
