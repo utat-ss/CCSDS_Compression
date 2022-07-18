@@ -1,5 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
+
+#include "logger/logger.h"
+
 // printing to binary
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \
@@ -18,16 +21,16 @@ void check_single_decode(void);
 
 
 void print_binary_32(uint32_t word){
-    printf("word: hex = %X, \tbin = "\
+    logger("DEBUG", "bin = " \
         BYTE_TO_BINARY_PATTERN " " \
         BYTE_TO_BINARY_PATTERN " " \
         BYTE_TO_BINARY_PATTERN " " \
         BYTE_TO_BINARY_PATTERN \
-        ", \thex = %x\n", word, \
+        ",\n", \
         BYTE_TO_BINARY(word>>24), \
         BYTE_TO_BINARY(word>>16), \
         BYTE_TO_BINARY(word>>8), \
-        BYTE_TO_BINARY(word), word);  
+        BYTE_TO_BINARY(word));  
 }
 
 

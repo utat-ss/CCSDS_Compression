@@ -7,7 +7,7 @@ LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm
 
 all: main.out test.out
 
-main.out: main.o encoder.o bitfile/bitfile.o
+main.out: main.o encoder.o bitfile/bitfile.o logger/logger.o
 	$(LD) $^ $(LIBS) $(LDFLAGS) $@
 
 test.out: test.o encoder.o bitfile/bitfile.o
@@ -20,12 +20,15 @@ encoder.o: encoder.c encoder.h bitfile/bitfile.h bitfile/bitfile.c
 	$(CC) $(CFLAGS) $< 
 
 bitfile/bitfile.o: bitfile/bitfile.c bitfile/bitfile.h
-	cd bitfile && $(MAKE) bitfile.o
+	cd bitfile && make bitfile.o
+
+logger/logger.o: logger/logger.c logger/logger.h
+	cd logger && make logger.o
 
 clean:
 	rm -f *.o
 	rm -f *.out
-	cd bitfile && $(MAKE) clean
+	cd bitfile && make clean
 
 run: main.out
 	./$<

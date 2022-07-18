@@ -252,29 +252,17 @@ bit_file_t *MakeBitFile(FILE *stream, const BF_MODES mode)
             bf->bitBuffer = 0;
             bf->bitCount = 0;
             bf->mode = mode;
-
-            // Thursday, June 30, 2022
-            // force endianness --> doesn't work, still has error
-            // bf->PutBitsNumFunc = &BitFilePutBitsLE;
-            // bf->GetBitsNumFunc = &BitFileGetBitsLE;
-            // printf("INFO: bitfile using LITTLE ENDIAN\n");
-
-            // bf->PutBitsNumFunc = &BitFilePutBitsBE;
-            // bf->GetBitsNumFunc = &BitFileGetBitsBE;
-            // printf("INFO: bitfile using BIG ENDIAN\n");
         
             switch (DetermineEndianess())
             {
                 case BF_LITTLE_ENDIAN:
                     bf->PutBitsNumFunc = &BitFilePutBitsLE;
                     bf->GetBitsNumFunc = &BitFileGetBitsLE;
-                    printf("INFO: bitfile using LITTLE ENDIAN\n");
                     break;
 
                 case BF_BIG_ENDIAN:
                     bf->PutBitsNumFunc = &BitFilePutBitsBE;
                     bf->GetBitsNumFunc = &BitFileGetBitsBE;
-                    printf("INFO: bitfile using BIG ENDIAN\n");
                     break;
 
                 case BF_UNKNOWN_ENDIAN:

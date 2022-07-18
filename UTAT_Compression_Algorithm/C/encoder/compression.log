@@ -1,0 +1,20 @@
+starting log
+Sun Jul 17 01:01:33 2022 [INFO]: parameter k = 7
+Sun Jul 17 01:01:33 2022 [INFO]: ==== multiple encode ====
+Sun Jul 17 01:01:33 2022 [DEBUG]: (0, 0): sample=181 | code=135      | num_bits_used=  9
+Sun Jul 17 01:01:33 2022 [DEBUG]: bin = 00000000 00000000 00000001 00110101,
+Sun Jul 17 01:01:33 2022 [DEBUG]: (0, 1): sample=252 | code=17c      | num_bits_used=  9
+Sun Jul 17 01:01:33 2022 [DEBUG]: bin = 00000000 00000000 00000001 01111100,
+Sun Jul 17 01:01:33 2022 [DEBUG]: (0, 2): sample=243 | code=173      | num_bits_used=  9
+Sun Jul 17 01:01:33 2022 [DEBUG]: bin = 00000000 00000000 00000001 01110011,
+Sun Jul 17 01:01:33 2022 [DEBUG]: (0, 3): sample=198 | code=146      | num_bits_used=  9
+Sun Jul 17 01:01:33 2022 [DEBUG]: bin = 00000000 00000000 00000001 01000110,
+Sun Jul 17 01:01:33 2022 [DEBUG]: (0, 4): sample= 60 | code=3c       | num_bits_used=  8
+Sun Jul 17 01:01:33 2022 [DEBUG]: bin = 00000000 00000000 00000000 00111100,
+Sun Jul 17 01:01:33 2022 [INFO]: ==== multiple decode ====
+Sun Jul 17 01:01:33 2022 [INFO]: ==== opening file using bitfile: output/encoded.bin ===
+Sun Jul 17 01:01:33 2022 [DEBUG]: decoded[ 0] = 181
+Sun Jul 17 01:01:33 2022 [DEBUG]: decoded[ 1] = 252
+Sun Jul 17 01:01:33 2022 [DEBUG]: decoded[ 2] = 243
+Sun Jul 17 01:01:33 2022 [DEBUG]: decoded[ 3] = 198
+Sun Jul 17 01:01:33 2022 [DEBUG]: decoded[ 4] =  60
