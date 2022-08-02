@@ -177,7 +177,8 @@ def prediction_calculation(ld_vector, weight_vector, local_sum, t, x, y, z, data
     pred_sample_value = np.floor(dr_sample_value/2)
 
     #The difference between the actual value and the predicted value is calculated
-    pred_residual = data - pred_sample_value
+    # pred_residual = data - pred_sample_value
+    pred_residual = data[x][y][z] - pred_sample_value    # 01 Aug 2022, Yong Da thinks this line is wrong
    
     #Both the predicted and dr predicted sample value are returned - latter is used in updating the weight vector
     return pred_sample_value, pred_residual, dr_sample_value

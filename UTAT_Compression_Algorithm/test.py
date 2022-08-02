@@ -158,6 +158,7 @@ def prediction_calculation_visualize(data):
     predicted_residuals = np.zeros([Nz, Ny, Nx])
 
     for z in range(0, Nz):
+        print("unpredict visualize: z = {}/{}".format(z, Nz-1))
         for y in range(0, Ny):
             for x in range(0, Nx):
                 t = x + y * Nx
@@ -173,7 +174,7 @@ def prediction_calculation_visualize(data):
                 predicted_sample, predicted_residual, dr_samp = comp.prediction_calculation(ld_vector,
                                                                                             weight_vector_new, local, t,
                                                                                             x, y, z, data)
-                print(x, y, z, "-> ", data[z, y, x], predicted_residual)
+                # print(x, y, z, "-> ", data[z, y, x], predicted_residual)
                 predicted_residuals[z, y, x] = predicted_residual
 
                 w_prev = weight_vector_new
@@ -323,6 +324,7 @@ def unpredict_visualize(data):
     data_final = np.zeros([Nz,Ny,Nx])
     encoded = []
     for z in range(0,Nz):
+        print("unpredict visualize: z = {}/{}".format(z, Nz-1))
         for y in range(0,Ny):
             for x in range(0,Nx):
                 t= x + y*Nx
@@ -363,11 +365,16 @@ def get_metrics(file_name, data_header, subset_size=100):
     hs_data = hs_data[:subset_size, :subset_size, :subset_size]
     bands = hs_data.shape[0]
 
+    prediction_calculation_visualize(hs_data)
+
+    '''
     encoded, decompressed = unpredict_visualize(hs_data)
 
     # RMSE calculation
+    print("RSME calculation")
     rms = 0
     for band in range(0, bands):
+        print("RSME calculation: band = {}/{}".format(band, bands-1))
         rms += mean_squared_error(hs_data[band, :, :], decompressed[band, :, :], squared=False)
     rms = rms / bands
 
@@ -376,9 +383,10 @@ def get_metrics(file_name, data_header, subset_size=100):
 
     print("RMSE: ", rms)
     print("Compression ratio: ", compression_ratio)
+    '''
 
-'''
-get_metrics("images/Indian_pines.mat", "indian_pines")
-print(dec_to_bin(52, 8))
-'''
+
+get_metrics("images/Indian_pines.mat", "indian_pines", subset_size=10)
+# print(dec_to_bin(52, 8))
+
 
