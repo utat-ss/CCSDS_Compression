@@ -1,18 +1,27 @@
-compress.out: main.o compression.o helperlib.o
-	gcc -L/usr/local/lib main.o compression.o helperlib.o -lgsl -lgslcblas -lm -o compress.out
+compression.out: main.o parse.o predict.o helperlib.o unitTests.o
+	gcc -L/usr/local/lib main.o parse.o predict.o helperlib.o -lgsl -lgslcblas -lm -o compression.out
 
-# compile with debug symbols enabled (-g option)
 main.o: main.c
 	gcc -Wall -I/usr/local/include -g -c main.c -o main.o
 
-helperlib.o: helperlib.c helperlib.h
-	gcc -Wall -I/usr/local/include -g -c helperlib.c -o helperlib.o
+parse.o: parser/parse.c parser/parse.h
+	gcc -Wall -I/usr/local/include -g -c parser/parse.c -o parse.o
 
-compression.o: compression.c compression.h
-	gcc -Wall -I/usr/local/include -g -c compression.c -o compression.o
+predict.o: predictor/predict.c predictor/predict.h
+	gcc -Wall -I/usr/local/include -g -c predictor/predict.c -o predict.o
+
+helperlib.o: predictor/helperlib.c predictor/helperlib.h
+	gcc -Wall -I/usr/local/include -g -c predictor/helperlib.c -o helperlib.o
+
+unitTests.o: unitTests/unitTests.c unitTests/unitTests.h
+	gcc -Wall -I/usr/local/include -g -c unitTests/unitTests.c -o unitTests.o
 
 clean:
 	rm *.o
+	rm *.out
 
-debug: compress.out
-	gdb compress.out
+run: compression.out
+	./compression.out "../images/data_10_145_145.txt"
+
+debug: compression.out
+	gdb --args compression.out "../images/data_10_145_145.txt"
