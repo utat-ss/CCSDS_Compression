@@ -390,3 +390,4 @@ get_metrics("images/Indian_pines.mat", "indian_pines", subset_size=10)
 # print(dec_to_bin(52, 8))
 
 
+encoder_visualize(data_one)
