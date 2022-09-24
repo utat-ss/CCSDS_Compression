@@ -1,11 +1,7 @@
 #ifndef HEADER
 #define HEADER
 
-int encodeHeader(void);
-int decodeHeader(void);
-int getConfig(void);
-
-
+//Struct Definitions
 typedef struct imageMetadata
 {
     //Essential
@@ -36,10 +32,6 @@ typedef struct imageMetadata
 
     //Table data subbblock
 
-
-
-
-
 } imageMetadata;
 
 typedef struct predictorMetadata
@@ -56,7 +48,7 @@ typedef struct predictorMetadata
 
 typedef struct entropyCodingMetadata
 {
-
+    //Fill in
 } entropyCodingMetadata;
 
 typedef struct encodingParams
@@ -68,36 +60,14 @@ typedef struct encodingParams
 } encodingParams;
 
 
+//Function Definitions
+uint64_t* encode_imageMetadata(imageMetadata* params, uint16_t size);
+void decode_imageMetadata(imageMetadata* params, uint16_t size);
 
 
-//Image Metadata
-//Essential
-const uint8_t  userDefined = 1;
-const uint16_t xSize = 5675;
-const uint16_t ySize = 876;
-const uint16_t zSize = 756;
-
-const uint8_t  sampledType = 1;           //Binary value 0/1
-const uint8_t  largeDynamicRangeFlag = 1; //Binary value 0/1
-const uint8_t  dynamicRange = 31;          //Only 4 bits used
-
-const uint8_t  sampledEncodingOrder = 1;     //Binary value 0/1
-const uint16_t subframeInterleavingDepth = 765;
-
-const uint8_t  outputWordSize = 2;                 //Only 3 bits used
-const uint8_t  entropyCoderType = 1;               //Only 2 bits used
-const uint8_t  quantizerFidelityControlMethod = 1; //Only 2 bits used
-
-const uint8_t  supplementaryInformationTableCount = 2; //Only 4 bits used
-
-//Supplementary Information Tables
-const uint8_t tableType = 1;      //Only 2 bits used
-const uint8_t tablePurpose = 1;   //Only 4 bits used
-const uint8_t tableStructure = 1; //Only 2 bits used
-
-const uint8_t suppUserDefinedData = 1; //Only 4 bits used
-
+//Image Metadata Global Information
 uint8_t imageMetadataSize = 13;
 uint8_t imageMetadataWidths[] = {8, 16, 16, 16, 1, 1, 4, 1, 16, 3, 2, 2, 4};
+
 
 #endif
