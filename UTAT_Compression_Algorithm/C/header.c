@@ -4,68 +4,55 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include "bitstreamer.h"
 #include "header.h"
-#include "bitstreamer.c"
 
-uint64_t* encode_imageMetadata(imageMetadata* params, uint16_t size)
+void encode_imageMetadata(imageMetadata* params)
 {
+    uint64_t* bitstream = init_bitstream();
+
     uint16_t* cursor = (uint16_t*) params;
-    uint64_t* bitstream = calloc(sizeof(uint64_t), get_size());
-    for(int i = 0; i <= 12; ++i)
+
+    for(int i = 0; i < imageMetadataSize; ++i)
     {
         printf("Adding variable to bitstream:%d\n", *(cursor + i));
-        add_to_bitstream(*(cursor + i), bitstream, size, imageMetadataWidths[i]);
+        write_to_bitstream(*(cursor + i), bitstream, imageMetadataWidths[i]);
         PRINT_BITSTREAM
     }
     printf("Final Bitstream: ");
     PRINT_BITSTREAM
     
-    padding = ((BUFFER_SIZE * 8) - used) % 64;
-    printf("Used: %i\n", used);
-    
-    printf("Padding: %i\n", padding);
+    pad_bitstream(bitstream);
 
-    if(padding != 0)
-    {
-        add_to_bitstream(0, bitstream, size, padding);
-        if(padding + used < BUFFER_SIZE * 8 && used != 0)
-            dump_to_disk(bitstream, 1);
-    }
-
-    return bitstream;
+    free(bitstream);
+    return;
 }
 
-void decode_imageMetadata(imageMetadata* params, uint16_t size)
+void decode_imageMetadata(imageMetadata* params)
 {
-    uint64_t* bitstream = calloc(get_size(), sizeof(uint64_t));
-    read_from_disk(bitstream, size);
+    uint64_t* bitstream = init_bitstream();
+    read_from_disk(bitstream);
 
     //PRINT_BITSTREAM
     
     uint16_t* cursor = (uint16_t*) params;
-    printf("Decoding used: %i\n", used);
-    printf("Decoding padding: %i\n", padding);
 
-    uint16_t throw_away = 0;
-    if(padding != 0)
-    {
-        printf("Grabbing tw\n");
-        throw_away = decode_bitstream(bitstream, get_size(), padding);
-    }
-
-    printf("Throw_away: %i\n", throw_away);
+    depad_bitstream(bitstream);
 
     printf("Before grabbing\n"); 
     PRINT_BITSTREAM
 
-    for(int i = 12; i >= 0; --i)
+    for(int i = imageMetadataSize - 1; i >= 0; --i)
     {
         //printf("%d\n", *(cursor + i));
-        uint16_t value = decode_bitstream(bitstream, get_size(), imageMetadataWidths[i]);
+        uint64_t value = read_from_bitstream(bitstream, imageMetadataWidths[i]);
         //printf("Grabbed: %hu\n", value);
-        printf("Grabbed: %hx\n", value);
-        *(cursor + i) = value;
+        printf("Grabbed: %llx\n", value);
+        *(cursor + i) = (uint16_t) value;
     }
+
+    free(bitstream);
+    return;
 }
 
 int main(void)
@@ -73,6 +60,7 @@ int main(void)
     printf("==== Image Metadata Test Unit ====\n");
     {
         reset_bin_file();
+        init_bitstreamer_variables();
 
         imageMetadata* params = calloc(sizeof(imageMetadata), 1);
        
@@ -94,15 +82,14 @@ int main(void)
 
         params->supplementaryInformationTableCount = 15; //Only 4 bits used
         
-        uint16_t size = get_size();
-        uint64_t* data = encode_imageMetadata(params, size);
+        encode_imageMetadata(params);
         
         printf("\nFINAL DISK CONTENT\n");
         system("./read");
 
         imageMetadata* params_empty = calloc(sizeof(imageMetadata), 1);
         printf("\nDECODING\n");
-        decode_imageMetadata(params_empty, size);
+        decode_imageMetadata(params_empty);
 
         if(memcmp(params_empty, params, 26) == 0)
             printf("Passed!\n");

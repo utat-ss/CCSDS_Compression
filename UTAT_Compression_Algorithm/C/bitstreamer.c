@@ -4,36 +4,54 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include "bitstreamer.h"
 
-//Runtime parameters
-#define BUFFER_SIZE 24 //In bytes
+uint64_t* init_bitstream(void)
+{
+    uint64_t* bitstream = calloc(sizeof(uint64_t), size);
+    
+    return bitstream;
+}
 
-//Debug macros
-#define PRINT_BITSTREAM for(int i = get_size() - 1; i >= 0; --i) printf("%016llx ", bitstream[i]); printf("\n");
+void init_bitstreamer_variables(void)
+{
+    used = 0;
+    read = 0;
+    padding = 0;
+    file_cursor = 0;
+    size = get_size();
+}
 
-//Global variables
-uint8_t  used = 0;
-uint8_t  read = 0;
-uint8_t  padding = 0;
-uint64_t file_cursor = 0;
-
-void dump_to_disk(uint64_t* bitstream, uint8_t reset)
+void write_to_disk(uint64_t* bitstream)
 {
     printf("Writing to disk: ");
     PRINT_BITSTREAM
     FILE *fptr;
     fptr = fopen("output/encoded.bin","ab");  // a for append, b for binary
-    fwrite(bitstream, sizeof(uint64_t), get_size(), fptr);
+    fwrite(bitstream, sizeof(uint64_t), size, fptr);
     fclose(fptr);
 
-    for(uint8_t i = 0; i < get_size(); ++i)
+    for(uint8_t i = 0; i < size; ++i)
         bitstream[i] = 0;
 
-    if(reset == 1) //I dont think this is needed anymore.
-        used = 0;
+    used = 0;
 }
 
-void add_to_bitstream(uint64_t value, uint64_t* bitstream, uint16_t size, uint8_t width)
+void read_from_disk(uint64_t* bitstream)
+{
+    //Read bitstream from bin file
+    //Check if SEEK_CUR is reset when closing
+    FILE *fptr;
+    fptr = fopen("output/encoded.bin", "rb");
+    file_cursor -= size * 8;
+    fseek(fptr, file_cursor, SEEK_END);
+    fread(bitstream, size, 8, fptr);
+    fclose(fptr);
+    read = 0;
+    //PRINT_BITSTREAM
+}
+
+void write_to_bitstream(uint64_t value, uint64_t* bitstream, uint8_t width)
 {
     //Buffer overflowing
     if(used + width >= BUFFER_SIZE * 8)
@@ -52,7 +70,7 @@ void add_to_bitstream(uint64_t value, uint64_t* bitstream, uint16_t size, uint8_
             temp_value = temp >> (64 - temp_width);
         }
         //DUMP TO DISK HERE
-        dump_to_disk(bitstream, 1);
+        write_to_disk(bitstream);
 
         width = (width - temp_width);
         value = value >> temp_width;
@@ -70,7 +88,7 @@ void add_to_bitstream(uint64_t value, uint64_t* bitstream, uint16_t size, uint8_
     used += width;
 }
 
-uint16_t decode_bitstream(uint64_t* bitstream, uint16_t size, uint8_t width)
+uint64_t read_from_bitstream(uint64_t* bitstream, uint8_t width)
 {
     uint64_t temp = 0;
     uint64_t value = 0;
@@ -106,7 +124,7 @@ uint16_t decode_bitstream(uint64_t* bitstream, uint16_t size, uint8_t width)
         
         //Read from disk
         //printf("READING FROM DISK\n");
-        read_from_disk(bitstream, size);
+        read_from_disk(bitstream);
         //PRINT_BITSTREAM
 
         width = width - temp_width;
@@ -131,7 +149,7 @@ uint16_t decode_bitstream(uint64_t* bitstream, uint16_t size, uint8_t width)
         }
         value = (value << temp_width) | temp_value;
         
-        return (uint16_t) value;
+        return value;
         
     }
     else
@@ -147,27 +165,47 @@ uint16_t decode_bitstream(uint64_t* bitstream, uint16_t size, uint8_t width)
         }
         read += width;
         //PRINT_BITSTREAM
-        return (uint16_t) (value >> (64 - width));
+        return (value >> (64 - width));
     }    
+}
+
+void pad_bitstream(uint64_t* bitstream)
+{
+    padding = ((BUFFER_SIZE * 8) - used) % 64;
+    printf("Used: %i\n", used);
+    
+    printf("Padding: %i\n", padding);
+
+    if(padding != 0)
+    {
+        write_to_bitstream(0, bitstream, padding);
+        if(padding + used < BUFFER_SIZE * 8 && used != 0)
+            write_to_disk(bitstream);
+    }
+
+    return;
+}
+
+void depad_bitstream(uint64_t* bitstream)
+{
+    printf("Decoding used: %i\n", used);
+    printf("Decoding padding: %i\n", padding);
+
+    uint16_t throw_away = 0;
+    if(padding != 0)
+    {
+        printf("Grabbing tw\n");
+        throw_away = read_from_bitstream(bitstream, padding);
+    }
+
+    printf("Throw_away: %i\n", throw_away);
+
+    return;
 }
 
 uint16_t get_size()
 {
     return ceil((float) BUFFER_SIZE / 8);
-}
-
-void read_from_disk(uint64_t* bitstream, uint16_t size)
-{
-    //Read bitstream from bin file
-    //Check if SEEK_CUR is reset when closing
-    FILE *fptr;
-    fptr = fopen("output/encoded.bin", "rb");
-    file_cursor -= get_size() * 8;
-    fseek(fptr, file_cursor, SEEK_END);
-    fread(bitstream, size, 8, fptr);
-    fclose(fptr);
-    read = 0;
-    //PRINT_BITSTREAM
 }
 
 void reset_bin_file(void)

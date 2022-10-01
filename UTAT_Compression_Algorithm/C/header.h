@@ -61,9 +61,8 @@ typedef struct encodingParams
 
 
 //Function Definitions
-uint64_t* encode_imageMetadata(imageMetadata* params, uint16_t size);
-void decode_imageMetadata(imageMetadata* params, uint16_t size);
-
+void encode_imageMetadata(imageMetadata* params);
+void decode_imageMetadata(imageMetadata* params);
 
 //Image Metadata Global Information
 uint8_t imageMetadataSize = 13;
