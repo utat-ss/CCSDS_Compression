@@ -8,12 +8,13 @@ c = 0b100 //4
 
 // A) On disk represtation without bitstreamer:
 00000101 00000011 00000100 //0 Padding to make each variable fill 1 byte minimum
+// Eff_A = num_of_needed_bits / num_of_used_bits = 8/24 = 0.333...
+
 // B) On disk represtation with bitstreamer:
 10111100 //101,11,100
+// Eff_B = num_of_needed_bits / num_of_used_bits = 8/8 = 1
 ```
-$$eff_A = \frac{\texttt{num\_of\_needed\_bits}}{\texttt{num\_of\_used\_bits}} = \frac{8}{24} = 0.333...$$
 
-$$eff_B = \frac{\texttt{num\_of\_needed\_bits}}{\texttt{num\_of\_used\_bits}} = \frac{8}{8} = 1$$
 
 # Functions
 ```c 
