@@ -11,9 +11,9 @@ c = 0b100 //4
 // B) On disk represtation with bitstreamer:
 10111100 //101,11,100
 ```
-$eff_A = \frac{\texttt{num\_of\_needed\_bits}}{\texttt{num\_of\_used\_bits}} = \frac{8}{24} = 0.333...$
+$$eff_A = \frac{\texttt{num\_of\_needed\_bits}}{\texttt{num\_of\_used\_bits}} = \frac{8}{24} = 0.333...$$
 
-$eff_B = \frac{\texttt{num\_of\_needed\_bits}}{\texttt{num\_of\_used\_bits}} = \frac{8}{8} = 1$
+$$eff_B = \frac{\texttt{num\_of\_needed\_bits}}{\texttt{num\_of\_used\_bits}} = \frac{8}{8} = 1$$
 
 # Functions
 ```c 
