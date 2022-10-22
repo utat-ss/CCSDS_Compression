@@ -65,6 +65,7 @@ unsigned int encode_sample(unsigned int sample, unsigned int k){
 	return ret;
 }
 
+//Wrap this function in something that gives a diff k value.
 uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int* num_bits_used){
 	uint32_t ret;
 	unsigned int M = (int) pow(2,k);

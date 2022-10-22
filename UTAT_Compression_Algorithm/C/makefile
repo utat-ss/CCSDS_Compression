@@ -1,5 +1,5 @@
-compress.out: main.o compression.o helperlib.o
-	gcc -L/usr/local/lib main.o compression.o helperlib.o -lgsl -lgslcblas -lm -o compress.out
+compress.out: main.o compression.o helperlib.o unitTests.o
+	gcc -L/usr/local/lib main.o compression.o helperlib.o unitTests.o -lgsl -lgslcblas -lm -o compress.out
 
 # compile with debug symbols enabled (-g option)
 main.o: main.c
@@ -10,6 +10,9 @@ helperlib.o: helperlib.c helperlib.h
 
 compression.o: compression.c compression.h
 	gcc -Wall -I/usr/local/include -g -c compression.c -o compression.o
+
+unitTests.o: unitTests.c unitTests.h
+	gcc -Wall -I/usr/local/include -g -c unitTests.c -o unitTests.o
 
 clean:
 	rm *.o
