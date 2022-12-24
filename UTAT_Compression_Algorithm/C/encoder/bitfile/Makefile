@@ -46,6 +46,7 @@ bitfile.o:	bitfile.c bitfile.h
 
 clean:
 	$(DEL) *.o
+	$(DEL) *.d
 	$(DEL) *.a
 	$(DEL) sample$(EXE)
 	$(DEL) testfile

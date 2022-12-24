@@ -5,4 +5,4 @@ logger.o: logger.c logger.h
 	$(CC) $(CFLAGS) $<
 
 clean:
-	rm -f *.o
+	rm -f *.o *.d
