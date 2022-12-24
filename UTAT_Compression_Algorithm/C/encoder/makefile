@@ -29,6 +29,7 @@ clean:
 	rm -f *.o
 	rm -f *.out
 	cd bitfile && make clean
+	cd logger && make clean
 
 run: main.out
 	./$<
