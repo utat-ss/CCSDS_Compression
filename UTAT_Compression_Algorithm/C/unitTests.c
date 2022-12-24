@@ -41,3 +41,48 @@ void testWeightUpdate(double dr_sample_value, double pred_sample, double pred_re
     }
     printf("\n");
 }
+
+void test_dec_to_bin(int d, uint8_t width)
+{
+    gsl_vector* vec = dec_to_bin(d, width);
+    printf("dec_to_bin vector: [");
+    for (int i = 0; i < vec->size; ++i)
+    {
+        printf("%i", (int) vec->data[i]);
+        if(i != vec->size - 1)
+            printf(", ");
+    }
+    printf("]\n");
+}
+
+void test_gsl_vector_append(gsl_vector* base, gsl_vector* addition)
+{
+    printf("Base: [");
+    for (int i = 0; i < base->size; ++i)
+    {
+        printf("%i", (int) base->data[i]);
+        if(i != base->size - 1)
+            printf(", ");
+    }
+    printf("]\n");
+
+    printf("Addition: [");
+    for (int i = 0; i < addition->size; ++i)
+    {
+        printf("%i", (int) addition->data[i]);
+        if(i != addition->size - 1)
+            printf(", ");
+    }
+    printf("]\n");
+
+    gsl_vector_append(base, addition);
+
+    printf("Appended Base: [");
+    for (int i = 0; i < base->size; ++i)
+    {
+        printf("%i", (int) base->data[i]);
+        if(i != base->size - 1)
+            printf(", ");
+    }
+    printf("]\n");
+}

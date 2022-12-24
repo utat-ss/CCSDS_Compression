@@ -89,6 +89,7 @@ void weightInitialization(gsl_vector *weight, int z, int Nz){
 Inputs: local difference vector, weight vector, calculated local sum, t (position in dataset), data value at position
 Output: returns predicted residual, and also modifies dr sample value and predicted sample value for weight update
 */
+//Yup
 void predictionCalculation(gsl_vector *local_d, gsl_vector *weight, int local_sum, int t, int data, double *dr_sample_value, double *pred_sample_value,
                            double *pred_residual){
     int s_min = (-1 * (pow(2, dynamic_range - 1)));
@@ -129,6 +130,7 @@ Inputs: double resolution sample value, predicted sample value, predicted residu
 Output: new weight vector, which is assumed to properly allocated beforehand.
         The function also frees the previous weight vectors and local difference vectors from memory
 */
+//Yup
 void weightUpdate(double dr_sample_value, double pred_sample, double pred_residual, int t, int z, int Nx, int Nz,
                   gsl_vector *weight_vector_prev, gsl_vector *local_d, gsl_vector *weight){
 
@@ -209,3 +211,63 @@ void mapper(double pred_samp, double pred_residual, double dr_samp, int t, unsig
         *mapped = (unsigned int)2 * abs(pred_residual) - 1;
     }
 }
+
+void encoder(double*** delta, int Nx, int Ny, int Nz, uint8_t initial_count_exp, k_zprime, uint8_t u_max)
+{
+    gsl_vector* encoded = gsl_vector_alloc(0);
+    for(int z = 0; z < Nz; ++z)
+    {
+        //Set initial counter and accumulator values for the band
+        uint8_t counter = 1 << initial_count_exp;
+        int accum_value = (int) ((1 / (1 << 7))*(3 * (2 << (k_zprime + 6)) - 49)*counter); //Equaiton 58
+        for(int y = 0; y < Ny; ++y)
+        {
+            for(int x = 0; x < Nx; ++x)
+            {
+                int t = y * Nx + x;
+                //At the first pixel, the endoced value is just the D-bit representation of delta
+                if(t == 0)
+                {
+                    gsl_vector* code = dec_to_bin(delta[z][y][x], dynamic_range);
+                    gsl_vector_append(encoded, code);
+                }
+                else
+                {
+                    //Using the adaptive code statistics, set the code parameter, according to equation 62 in section 5.4.3.2.4
+                    int condition = accum_value + (int) ((49 / (1 << 7)) * counter);
+                    uint8_t code_param = 0;
+                    if(2*counter > condition)
+                        code_param = 0;
+                    else
+                        for(int i = dynamic_range; i > 0; --i)
+                        {
+                            if(counter * (1 << i) <= condition)
+                            {
+                                code_param = i;
+                                break;
+                            }
+                                
+                        }
+                    //Use golomb power of two code words to write a binary codeword, based on the user-defined unary length limit
+                    int unary_length_limit = (int)(delta[z][y][x] / (1 << code_param));
+                    if(unary_length_limit < u_max)
+                    {
+                        //Write unary code
+                        gsl_vector* u = gsl_vector_calloc(unary_length_limit);
+                        gsl_vector_add_constant(u, 1);
+                        gsl_vector* one = gsl_vector_calloc(1);
+                        gsl_vector_append(u, one);
+
+                        //Write remainder code
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+//Notes
+/*
+Replace all ints with uint32_t and stuff. Make all variable types explicit in terms of bit size.
+*/
