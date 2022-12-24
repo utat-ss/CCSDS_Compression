@@ -1,18 +1,45 @@
-compress.out: main.o compression.o helperlib.o
-	gcc -L/usr/local/lib main.o compression.o helperlib.o -lgsl -lgslcblas -lm -o compress.out
+CC = gcc	# compiler
+LD = gcc	# linker
+CFLAGS = -Wall -I/usr/local/include -g -c	# compiler flags
+LDFLAGS = 	# linker flags
+# LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
+LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm
 
-# compile with debug symbols enabled (-g option)
-main.o: main.c
-	gcc -Wall -I/usr/local/include -g -c main.c -o main.o
+SOURCES := \
+	main.c	\
+	compression.c	\
+	helperlib.c		\
+	unitTests.c		\
 
-helperlib.o: helperlib.c helperlib.h
-	gcc -Wall -I/usr/local/include -g -c helperlib.c -o helperlib.o
+HEADERS := $(SOURCES:.c=.h)
+OBJECTS := $(SOURCES:.c=.o)
 
-compression.o: compression.c compression.h
-	gcc -Wall -I/usr/local/include -g -c compression.c -o compression.o
+$(info $$SOURCES is [${SOURCES}])
+$(info $$HEADERS is [${HEADERS}])
+$(info $$OBJECTS is [${OBJECTS}])
 
-clean:
-	rm *.o
+all: compress.out
+
+# link all objects together into single executable
+compress.out: $(OBJECTS)
+	$(LD) $^ $(LDFLAGS) $(LIBS) -o $@
+
+# for every item in objects list, it depends on the *.o -> *.c version of the code
+$(OBJECTS): %.o:%.c
+# produce a .d makefile syntax file that contains the header file dependencies
+	$(CC) -MT $@ -MM $(CFLAGS) $< > $(<:%.c=%.d)
+# for every .c file, compile a produce a .o file
+	$(CC) $(CFLAGS) $< -o $@
+
+# pull in dependency information for existing .o files
+ -include $(OBJECTS:.o=.d)
+
 
 debug: compress.out
-	gdb compress.out
+	gdb $<
+
+.PHONY: clean
+clean:
+	rm -f *.o
+	rm -f *.d
+	rm -rf *.out

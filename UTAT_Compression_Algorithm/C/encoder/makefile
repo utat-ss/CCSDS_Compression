@@ -34,6 +34,7 @@ $(OBJECTS): %.o:%.c
 # pull in dependency information for existing .o files
  -include $(OBJECTS:.o=.d)
 
+.PHONY: clean
 clean:
 	rm -rf *.o
 	rm -rf *.d
