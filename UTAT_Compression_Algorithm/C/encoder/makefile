@@ -35,11 +35,9 @@ $(OBJECTS): %.o:%.c
  -include $(OBJECTS:.o=.d)
 
 clean:
-	rm -f *.o
-	rm -f *.d
-	rm -f *.out
-	cd bitfile && make clean
-	cd logger && make clean
+	rm -rf *.o
+	rm -rf *.d
+	rm -rf *.out
 
 run: main.out
 	./$<
