@@ -8,8 +8,9 @@ LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm
 SOURCES := \
 	main.c	\
 	compression.c	\
-	helperlib.c		\
-	unitTests.c		\
+	predictor/helperlib.c		\
+	predictor/predict.c		\
+	unitTests/unitTests.c		\
 
 HEADERS := $(SOURCES:.c=.h)
 OBJECTS := $(SOURCES:.c=.o)

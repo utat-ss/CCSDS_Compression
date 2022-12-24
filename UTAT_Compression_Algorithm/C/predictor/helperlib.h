@@ -3,6 +3,7 @@
 
 #include <gsl/gsl_vector.h>
 #include <string.h>
+#include <stdint.h>
 
 // helper functions
 int sign(double x);

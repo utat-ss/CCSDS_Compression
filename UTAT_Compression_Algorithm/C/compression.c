@@ -212,7 +212,7 @@ void mapper(double pred_samp, double pred_residual, double dr_samp, int t, unsig
     }
 }
 
-void encoder(double*** delta, int Nx, int Ny, int Nz, uint8_t initial_count_exp, k_zprime, uint8_t u_max)
+void encoder(double*** delta, int Nx, int Ny, int Nz, uint8_t initial_count_exp, uint8_t k_zprime, uint8_t u_max)
 {
     gsl_vector* encoded = gsl_vector_alloc(0);
     for(int z = 0; z < Nz; ++z)
