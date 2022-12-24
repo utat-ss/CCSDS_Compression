@@ -2,4 +2,7 @@
 *.pyc
 *.o
 *.out
-.vscode
+*.d
+
+*temp/
+*.vscode
