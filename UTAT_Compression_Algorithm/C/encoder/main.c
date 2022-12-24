@@ -306,7 +306,7 @@ void view_binary_file_using_bitfile(char* filename){
 
 
 int main(void){
-    logger_init();
+    logger_init("encoder.log");
     // check_single_encode();
     // check_single_decode();
     // check_read_write_to_binary_file();

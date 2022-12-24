@@ -10,10 +10,14 @@
 // global
 FILE* logger_fptr;
 
-// to be called before any logger use
-void logger_init(){
+/**
+ * @brief to be called before logger library use
+ * 
+ * @param filename 
+ */
+void logger_init(const char* filename){
    if (LOG_TO_FILE){
-      logger_fptr = fopen("compression.log", "w+");
+      logger_fptr = fopen(filename, "w+");
       fprintf(logger_fptr, "starting log\n");
    }
 }

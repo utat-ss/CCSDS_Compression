@@ -14,7 +14,7 @@
 #define LOG_TO_FILE 		1
 #define LOG_TO_TERMINAL 	1
 
-void logger_init();
+void logger_init(const char* filename);
 void logger_finalize();
 void logger(const char* tag, const char* format, ...);
 
