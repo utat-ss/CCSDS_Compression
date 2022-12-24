@@ -4,8 +4,7 @@
 #include "unitTests.h"
 #include "dataCube.h"
 
-int main()
-{
+int main(int argc, char* argv[]){
     double data = 16;
     int t = 3;
     int localSum = 5;
@@ -19,4 +18,6 @@ int main()
 
     testPredictionCalculation(data, localSum, t, z, Nz, local_d);
     testWeightUpdate(3, 1, 15, t, z, Nx, Nz, weight, local_d);
+
+    return 0;
 }

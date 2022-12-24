@@ -7,27 +7,21 @@ decompression steps.
 #include "helperlib.h"
 
 // Returns the sign of an integer, with 0 returned as a positive
-int sign(double x)
-{
-    if (x >= 0)
-    {
+int sign(double x){
+    if (x >= 0){
         return 1;
     }
-    else
-    {
+    else{
         return -1;
     }
 }
 
-double clamp(double x, double min, double max)
-{
+double clamp(double x, double min, double max){
     double result = x;
-    if (x < min)
-    {
+    if (x < min){
         result = min;
     }
-    else if (x > max)
-    {
+    else if (x > max){
         result = max;
     }
 
