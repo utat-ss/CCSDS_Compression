@@ -1,20 +1,80 @@
 starting log
-Sat Dec 24 20:52:43 2022 [INFO]: parameter k = 7
-Sat Dec 24 20:52:43 2022 [INFO]: ==== multiple encode ====
-Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 0): sample=208 | code=150      | num_bits_used=  9
-Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 01010000,
-Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 1): sample=238 | code=16e      | num_bits_used=  9
-Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 01101110,
-Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 2): sample= 38 | code=26       | num_bits_used=  8
-Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000000 00100110,
-Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 3): sample=131 | code=103      | num_bits_used=  9
-Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 00000011,
-Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 4): sample=217 | code=159      | num_bits_used=  9
-Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 01011001,
-Sat Dec 24 20:52:43 2022 [INFO]: ==== multiple decode ====
-Sat Dec 24 20:52:43 2022 [INFO]: ==== opening file using bitfile: output/encoded.bin ===
-Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 0] = 208
-Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 1] = 238
-Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 2] =  38
-Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 3] = 131
-Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 4] = 217
+Sat Dec 24 23:46:01 2022 [INFO]: parameter k = 7
+Sat Dec 24 23:46:01 2022 [INFO]: ==== multiple encode ====
+Sat Dec 24 23:46:01 2022 [DEBUG]: (0, 0): sample=157 | code=11d      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00011101,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (0, 1): sample=138 | code=10a      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00001010,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (0, 2): sample= 16 | code=10       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 00010000,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (0, 3): sample= 39 | code=27       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 00100111,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (0, 4): sample=184 | code=138      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00111000,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (1, 0): sample=252 | code=17c      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01111100,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (1, 1): sample= 82 | code=52       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 01010010,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (1, 2): sample=176 | code=130      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00110000,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (1, 3): sample=147 | code=113      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00010011,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (1, 4): sample= 86 | code=56       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 01010110,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (2, 0): sample=141 | code=10d      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00001101,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (2, 1): sample=195 | code=143      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01000011,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (2, 2): sample=195 | code=143      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01000011,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (2, 3): sample=117 | code=75       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 01110101,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (2, 4): sample=213 | code=155      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01010101,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (3, 0): sample=204 | code=14c      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01001100,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (3, 1): sample=147 | code=113      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00010011,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (3, 2): sample= 43 | code=2b       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 00101011,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (3, 3): sample=199 | code=147      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01000111,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (3, 4): sample= 87 | code=57       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 01010111,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (4, 0): sample= 41 | code=29       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 00101001,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (4, 1): sample=177 | code=131      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 00110001,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (4, 2): sample=193 | code=141      | num_bits_used=  9
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000001 01000001,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (4, 3): sample= 52 | code=34       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 00110100,
+Sat Dec 24 23:46:01 2022 [DEBUG]: (4, 4): sample=113 | code=71       | num_bits_used=  8
+Sat Dec 24 23:46:01 2022 [DEBUG]: bin = 00000000 00000000 00000000 01110001,
+Sat Dec 24 23:46:01 2022 [INFO]: ==== multiple decode ====
+Sat Dec 24 23:46:01 2022 [INFO]: ==== opening file using bitfile: output/encoded.bin ===
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 0] = 157
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 1] = 138
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 2] =  16
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 3] =  39
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 4] = 184
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 5] = 252
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 6] =  82
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 7] = 176
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 8] = 147
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[ 9] =  86
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[10] = 141
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[11] = 195
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[12] = 195
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[13] = 117
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[14] = 213
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[15] = 204
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[16] = 147
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[17] =  43
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[18] = 199
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[19] =  87
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[20] =  41
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[21] = 177
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[22] = 193
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[23] =  52
+Sat Dec 24 23:46:01 2022 [DEBUG]: decoded[24] = 113

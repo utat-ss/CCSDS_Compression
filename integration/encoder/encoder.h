@@ -11,6 +11,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <gsl/gsl_matrix.h>
 
 #include "bitfile.h"
 
@@ -23,8 +24,16 @@
   (byte & 0x08 ? '1' : '0'), \
   (byte & 0x04 ? '1' : '0'), \
   (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0') 
-  
+  (byte & 0x01 ? '1' : '0')
+
+void check_single_encode(void);
+void check_single_decode(void);
+void check_read_write_to_binary_file(void);
+gsl_matrix_int* encode_rng_gsl_matrix(int nrow, int ncol, int range, int k);
+void check_multiple_decode(char *filename, int k, uint32_t *decoded_array, uint32_t decoded_size);
+void view_binary_file(char *filename);
+void view_binary_file_using_bitfile(char *filename);
+
 // Yong Da's naive implementation
 unsigned int encode_sample(unsigned int sample, unsigned int k);
 
@@ -54,5 +63,6 @@ uint32_t decode_sample(uint32_t code, unsigned int k);
  * @return        [decoded sample, held in a unsigned 32-bit int container]
  */
 uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k);
+
 
 #endif // ENCODER_H

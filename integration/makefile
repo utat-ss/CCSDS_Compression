@@ -1,6 +1,6 @@
 CC = gcc	# compiler
 LD = gcc	# linker
-CFLAGS = -Wall -I/usr/local/include -Iutil -g -c	# compiler flags
+CFLAGS = -Wall -I/usr/local/include -Iutil -I -g -c	# compiler flags
 LDFLAGS = 	# linker flags
 # LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
 LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm
@@ -11,13 +11,16 @@ SOURCES :=	\
 	util/bitfile.c		\
 	util/logger.c		\
 	util/gsl_extensions.c 	\
+	util/matrix.c	\
 
 HEADERS := $(SOURCES:.c=.h)
 OBJECTS := $(SOURCES:.c=.o)
+DEPENDENCIES := $(SOURCES:.c=.d)
 
 $(info $$SOURCES is [${SOURCES}])
 $(info $$HEADERS is [${HEADERS}])
 $(info $$OBJECTS is [${OBJECTS}])
+$(info $$DEPENDENCIES is [${DEPENDENCIES}])
 
 all: main.out
 
@@ -37,9 +40,8 @@ $(OBJECTS): %.o:%.c
 
 .PHONY: clean
 clean:
-	rm -rf *.o
-	rm -rf *.d
-	rm -rf *.out
+	rm -f $(OBJECTS)
+	rm -f $(DEPENDENCIES)
 
 run: main.out
 	./$<
