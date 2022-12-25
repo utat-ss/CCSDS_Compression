@@ -1,0 +1,20 @@
+starting log
+Sat Dec 24 20:52:43 2022 [INFO]: parameter k = 7
+Sat Dec 24 20:52:43 2022 [INFO]: ==== multiple encode ====
+Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 0): sample=208 | code=150      | num_bits_used=  9
+Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 01010000,
+Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 1): sample=238 | code=16e      | num_bits_used=  9
+Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 01101110,
+Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 2): sample= 38 | code=26       | num_bits_used=  8
+Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000000 00100110,
+Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 3): sample=131 | code=103      | num_bits_used=  9
+Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 00000011,
+Sat Dec 24 20:52:43 2022 [DEBUG]: (0, 4): sample=217 | code=159      | num_bits_used=  9
+Sat Dec 24 20:52:43 2022 [DEBUG]: bin = 00000000 00000000 00000001 01011001,
+Sat Dec 24 20:52:43 2022 [INFO]: ==== multiple decode ====
+Sat Dec 24 20:52:43 2022 [INFO]: ==== opening file using bitfile: output/encoded.bin ===
+Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 0] = 208
+Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 1] = 238
+Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 2] =  38
+Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 3] = 131
+Sat Dec 24 20:52:43 2022 [DEBUG]: decoded[ 4] = 217

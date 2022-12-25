@@ -6,6 +6,7 @@
  * able to quickly turn on/off debug messages for the encoder
  * https://stackoverflow.com/questions/6508461/logging-library-for-c
  */
+#include <stdint.h>  // uint32_t and other types
 
 #ifndef LOGGER_H
 #define LOGGER_H
@@ -17,6 +18,8 @@
 void logger_init(const char* filename);
 void logger_finalize();
 void logger(const char* tag, const char* format, ...);
+
+void print_binary_32(uint32_t word);
 
 // printing to binary
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
@@ -30,16 +33,6 @@ void logger(const char* tag, const char* format, ...);
         (byte & 0x02 ? '1' : '0'), \
         (byte & 0x01 ? '1' : '0')
 
-void check_single_encode(void);
-void check_single_decode(void);
 
-void print_binary_32(uint32_t word)
-{
-    logger("DEBUG", "bin = " BYTE_TO_BINARY_PATTERN " " BYTE_TO_BINARY_PATTERN " " BYTE_TO_BINARY_PATTERN " " BYTE_TO_BINARY_PATTERN ",\n",
-           BYTE_TO_BINARY(word >> 24),
-           BYTE_TO_BINARY(word >> 16),
-           BYTE_TO_BINARY(word >> 8),
-           BYTE_TO_BINARY(word));
-}
 
 #endif /* LOG_H */
