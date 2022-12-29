@@ -1,5 +1,5 @@
 /**
- * @file matrix.h
+ * @file mymatrix.h
  * @author Yong Da Li
  * @brief brief implementation of matrix and vectors
  * @version 0.1
@@ -10,6 +10,9 @@
  */
 
 #include <stdint.h>
+
+#ifndef MYMATRIX_H
+#define MYMATRIX_H
 
 
 typedef struct mymatrix{
@@ -42,5 +45,11 @@ void vec_set(myvector* vec, int i, float val);
 void pretty_print_mat(mymatrix* mat);
 void pretty_print_vec(myvector* vec);
 
+//saving
+void pretty_save_mat(mymatrix* mat, char* filepath);
+void pretty_save_vec(myvector* vec, char* filepath);
+
 // math
 float vec_dot_prod(myvector* vecA, myvector* vecB);
+
+#endif /* MYMATRIX_H */

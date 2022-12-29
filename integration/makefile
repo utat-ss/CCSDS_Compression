@@ -3,15 +3,14 @@ LD = gcc	# linker
 CFLAGS = -Wall -I/usr/local/include -Iutil -I -g -c	# compiler flags
 LDFLAGS = 	# linker flags
 # LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
-LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm
+LIBS = -lm
 
 SOURCES :=	\
 	main.c	\
 	encoder/encoder.c	\
 	util/bitfile.c		\
 	util/logger.c		\
-	util/gsl_extensions.c 	\
-	util/matrix.c	\
+	util/mymatrix.c	\
 
 HEADERS := $(SOURCES:.c=.h)
 OBJECTS := $(SOURCES:.c=.o)

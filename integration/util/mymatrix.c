@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "matrix.h"
+#include "mymatrix.h"
 #include "logger.h"
 
 // TODO: make it work without malloc
@@ -116,6 +116,45 @@ void pretty_print_vec(myvector* vec) {
     }
 }
 
+
+// saving
+void pretty_save_mat(mymatrix* mat, char* filepath){
+    FILE* fptr;
+    fptr = fopen(filepath, "w");
+
+    int nrows = mat->nrows;
+    int ncols = mat->ncols;
+
+    fprintf(fptr, "----- matrix ----- \n");
+    fprintf(fptr, "size: %d x %d\n", nrows, ncols);
+
+    int i, j;
+    for (i = 0; i < nrows; i++) {
+        for (j = 0; j < ncols; j++) {
+            fprintf(fptr, "%5.3f ", mat_get(mat, i, j));  // %3d, at least 3 wide
+        }
+        fprintf(fptr, "\n");
+    }
+
+    fclose(fptr);
+}
+
+void pretty_save_vec(myvector* vec, char* filepath){
+    FILE* fptr;
+    fptr = fopen(filepath, "w");
+
+    int size = vec->size;
+
+    fprintf(fptr, "----- vector ----- \n");
+    fprintf(fptr, "size: %d\n", size);
+
+    int i;
+    for (i = 0; i < size; i++) {
+        fprintf(fptr, "%5.3f\n", vec_get(vec, i));  // %3d, at least 3 wide
+    }
+
+    fclose(fptr);
+}
 
 // math
 float vec_dot_prod(myvector* vecA, myvector* vecB){

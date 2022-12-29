@@ -1,6 +1,36 @@
 # Getting CCSDS in C to work
 Yong Da Li
 
+
+## Viewing hex files
+- us VSCode hex editor
+- or `hexdump -C <binary_file>`
+    - `-C` = canonical, always get consistent byte-by-byte output regardless of your system's endianness
+
+## Saturday, December 29, 2022
+
+
+## Saturday, December 24, 2022
+### restructure
+- changed to have a top-level make file
+
+
+### predictor
+- reread that paper to re-familiarize myself with the predictor
+>Post-print of: "A tutorial on image compression for optical space imaging systems" / I. Blanes, E. Magli, J. Serra-Sagristà in IEEE Geoscience and remote sensing magazine (IEEE), Vol. 2, Issue 3 (Sept. 2014) , p. 8-26. DOI 10.1109/MGRS.2014.2352465
+
+- this also helps: An Efficient Real-Time FPGA Implementation of the CCSDS-123 Compression Standard for Hyperspectral Images
+> https://ieeexplore.ieee.org/document/8472142
+  
+### away from GSL
+- since we're literally only doing vector-vector operations, I made my own matrix/vector library
+- don't need to use GSL
+- this is work that needs to be done at some point --> need to make it work on ARM math operations
+
+### VSCode
+- back to using VSCode on Windows side (not SSH into WLS2)
+    - file index doesn't refresh automatically --> annoying because file list is not accurate
+
 ## Friday, December 23, 2022
 ### decompression
 - run the predictor to see what the predicted values are

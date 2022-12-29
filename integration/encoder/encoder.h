@@ -14,6 +14,7 @@
 #include <gsl/gsl_matrix.h>
 
 #include "bitfile.h"
+#include "mymatrix.h"
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \
@@ -29,7 +30,8 @@
 void check_single_encode(void);
 void check_single_decode(void);
 void check_read_write_to_binary_file(void);
-gsl_matrix_int* encode_rng_gsl_matrix(int nrow, int ncol, int range, int k);
+mymatrix* encode_rng_mymatrix(int nrows, int ncols, int min, int max, int k);
+gsl_matrix_int* encode_rng_gsl_matrix(int nrows, int ncols, int range, int k);
 void check_multiple_decode(char *filename, int k, uint32_t *decoded_array, uint32_t decoded_size);
 void view_binary_file(char *filename);
 void view_binary_file_using_bitfile(char *filename);
