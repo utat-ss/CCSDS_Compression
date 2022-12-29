@@ -1,202 +1,180 @@
 /**
  * Yong Da Li
  * Saturday, June 4, 2022
- * 
+ *
  * section 5.4.3.2.2 Length-Limited Golomb-Power-of-2 Codeword of CCSDS123 standard
  * encoder
  */
 #include <math.h>
 #include <stdint.h>
 
-#include "logger.h"
 #include "encoder.h"
+#include "logger.h"
 #include "mymatrix.h"
 
+
+
+/* ============= single encode and decode functions =========== */
+
 /**
- * returns the GOP2 code word for an unsigned integer as a char array 
- * @param  sample 	- input integer
- * @param  k		- sample/2**k parameter
- * @return 			- char array of GOP2 code word
+ * @brief optimized Golomb rice encoder
+ * https://michaeldipperstein.github.io/rice.html
+ *
+ * @param sample        sample to be encoded, note it's uint32_t size (will need to be increased)
+ * @param k             control parameter, divisor M = 2^k
+ * @param num_bits_used return by reference, how many bits were used
+ * @return uint32_t     encoded sample, stored as 23-bit integer
  */
-unsigned int encode_sample(unsigned int sample, unsigned int k){
-	unsigned int ret;
-	unsigned int unary = 0;	// unary portion, pad with 1's so initialize to 0
-	unsigned int binary;	// binary portion
+uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int *num_bits_used) {
+    uint32_t ret;
+    unsigned int M = (int)pow(2, k);
+    unsigned int quotient;
+    unsigned int remainder;
+    unsigned int unary = 0;
 
-	// compute portions needed
-	unsigned int divisor = (int) pow(2,k);
-	unsigned int quotient = sample / divisor;
-	unsigned int remainder = sample % divisor;
+    // calculate using bitwise operations
+    quotient = sample >> k;
+    remainder = sample & (M - 1);
 
-	/* debug messages
-	printf("sample: %u\n", sample);
-	printf("k: %u\n", k);
-	printf("divisor: %u\n", divisor);
-	printf("quotient: %u\n", quotient);
-	printf("remainder: %u\n", remainder);
-	*/
+    // number of bits needed
+    // quotient in unary + 1 for unary stop character + k bits for remainder
+    // 		- actually don't need this since the output is like: 00100010
+    // 		- go by "first 1", that's the start of the sample, stored in 32 bit integer
+    /**
+     * number of bits used
+     * - always +1 for the 0 stop character (0, 10, 110, 1110, etc)
+     * - +quotient for the unary portion
+     * - +k for the remainder
+     */
+    if (quotient > 0) {
+        *num_bits_used = quotient + 1 + k;
+    } else {  // if don't need unary portion, then just use k bits, always plus stop character
+        *num_bits_used = k + 1;
+    }
 
-	// unary portion --> pad with 1's and stop character 0, since it makes debugging easier
-	// 					can easily find start of unary portion in integer, since it's leading 1's
-	while (quotient > 0){
-		unary = (unary | 0x1) << 1;	// pad with 1's
-		quotient--;
-	}
-	// don't need to add stop character since unary was initialized with 0's
+    // create unary encoding of quotient
+    while (quotient > 0) {
+        unary = (unary | 0x1) << 1;  // pad with 1's
+        quotient--;
+    }
 
+    // combine
+    ret = (unary << k) | remainder;
 
-	// binary portion
-	unsigned int binary_bitmask = 0;
-	int k_copy = k;
-	while (k_copy>0){	// create bit mask
-		binary_bitmask = (binary_bitmask << 1 | 0x1);
-		k_copy--;
-	}
-	binary = remainder & binary_bitmask; // create binary portion
-
-
-	// combine
-	ret = (unary<<k) | binary; // length of bitmask is k
-
-	/* debug messages
-	printf("unary: \t\t"BYTE_TO_BINARY_PATTERN"\n", BYTE_TO_BINARY(unary));
-	printf("binary: \t"BYTE_TO_BINARY_PATTERN"\n", BYTE_TO_BINARY(binary));
-	*/
-
-	return ret;
-}
-
-//Wrap this function in something that gives a diff k value.
-uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int* num_bits_used){
-	uint32_t ret;
-	unsigned int M = (int) pow(2,k);
-	unsigned int quotient;
-	unsigned int remainder;
-	unsigned int unary = 0;
-
-	// calculate using bitwise operations
-	quotient = sample >> k;
-	remainder = sample & (M-1);
-
-	// number of bits needed
-	// quotient in unary + 1 for unary stop character + k bits for remainder
-	// 		- actually don't need this since the output is like: 00100010
-	// 		- go by "first 1", that's the start of the sample, stored in 32 bit integer
-	 /**
-	  * number of bits used
-	  * - always +1 for the 0 stop character (0, 10, 110, 1110, etc)
-	  * - +quotient for the unary portion
-	  * - +k for the remainder
-	  */
-	if (quotient > 0){
-		*num_bits_used = quotient + 1 + k;
-	}
-	else{	// if don't need unary portion, then just use k bits, always plus stop character
-		*num_bits_used = k+1;
-	}
-
-	// create unary encoding of quotient
-	while (quotient > 0){
-		unary = (unary | 0x1) << 1;	// pad with 1's
-		quotient--;
-	}	
-
-	// combine
-	ret = (unary << k) | remainder;
-
-	return ret;
+    return ret;
 }
 
 
-uint32_t decode_sample(uint32_t code, unsigned int k){
-	uint32_t ret;
-	int i = 32; // indexing variable, start at bit 32 (left edge) and work backwards
-	uint32_t quotient = 0; 
-	uint32_t remainder = 0;
+/**
+ * @brief decodes a single sample, from a unsigned 32-bit unsigned integer
+ *      assumes there will always be a unary bit
+ * 
+ * @param code          encoded value to be decoded
+ * @param k             divisor control parameter M = 2^k
+ * @return uint32_t 
+ */
+uint32_t decode_sample(uint32_t code, unsigned int k) {
+    uint32_t ret;
+    int i = 32;  // indexing variable, start at bit 32 (left edge) and work backwards
+    uint32_t quotient = 0;
+    uint32_t remainder = 0;
 
-	// structure: 0000001111011
-	// 			  ^^^^^^ 		not encoded values, padding
-	// 			        ^^^^^	unary value + stop character 0
-	// 			             ^^ last k bits are remainder 
-	
-	/**
-	 * TODO: Thursday, June 30, 2022
-	 * doesn't account for the case where there is no unary
-	 * aka it goes directly into truncated binary
-	 * ex. sample = 28, k=5 --> divisor = 32
-	 * 	encoded = no unary + bin(28) = 0b11100
-	 * 	notice binary is 5 bit long representation (same as k)
-	 * 	
-	 */
+    // structure: 0000001111011
+    // 			  ^^^^^^ 		not encoded values, padding
+    // 			        ^^^^^	unary value + stop character 0
+    // 			             ^^ last k bits are remainder
 
-	// find the leading 1
-	while( (code & (1<<i)) >> i != 1 ){
-		i--;
-	}
+    /**
+     * Yong Da Li: Thursday, June 30, 2022
+     * doesn't account for the case where there is no unary
+     * aka it goes directly into truncated binary
+     * ex. sample = 28, k=5 --> divisor = 32
+     * 	encoded = no unary + bin(28) = 0b11100
+     * 	notice binary is 5 bit long representation (same as k)
+     *
+     * Yong Da Li: Thursday, December 29, 2022
+     * solution was to used a "num_bits_used" field 
+     */
 
-	// count number of 1's in unary, until stop character 0
-	while ( (code & (1<<i)) >> i == 1 ){
-		i--;
-		quotient++;
-	}
+    // find the leading 1
+    while ((code & (1 << i)) >> i != 1) {
+        i--;
+    }
 
-	// want to extract last k bits
-	// shift all to left, then shift right to pull out leading 0's
-	remainder = code << (32-k);
-	remainder = remainder >> (32-k);
+    // count number of 1's in unary, until stop character 0
+    while ((code & (1 << i)) >> i == 1) {
+        i--;
+        quotient++;
+    }
 
-	// combine
-	ret = (int) pow(2,k) * quotient + remainder;
+    // want to extract last k bits
+    // shift all to left, then shift right to pull out leading 0's
+    remainder = code << (32 - k);
+    remainder = remainder >> (32 - k);
 
-	return ret;
+    // combine
+    ret = (int)pow(2, k) * quotient + remainder;
+
+    return ret;
 }
 
 
-uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k){
-	uint32_t decoded = 0;
-	uint32_t c;
-	uint32_t i = 0;
-	uint32_t unary_count = 0;
-	uint32_t truncated_binary = 0;
+/* ============= streaming encode and decode functions =========== */
 
-	c = BitFileGetBit(stream);
-	// printf("DEBUG: first character=%d\n", c);
+/**
+ * @brief decodes one sample per function call, from an open bitfile handle
+ *
+ * @param stream        open bitfile handle, will be read continually
+ * @param k             must know divisor size for decoding, M = 2^k, k control parameter
+ * @return uint32_t     decoded sample, held in a unsigned 32-bit container
+ */
+uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k) {
+    uint32_t decoded = 0;
+    uint32_t c;
+    uint32_t i = 0;
+    uint32_t unary_count = 0;
+    uint32_t truncated_binary = 0;
 
+    c = BitFileGetBit(stream);
 
-	// assume unary portion first
-	if (c == 0){	// if first entry is 0, then the next k bits are the truncated binary
-		// printf("DEBUG: no unary portion, only truncated binary\n");
-		for (i=0; i<k; i++){
-			truncated_binary = truncated_binary | (c << (k-i));	// add in backwards order, since reading bits in backwards order
-			c = BitFileGetBit(stream);	// get next bit
-		}
-		truncated_binary = truncated_binary | (c << (k-i));	// need to do it for the last bit
+    // assume unary portion first
+    if (c == 0) {
+        // if first entry is 0, then the next k bits are the truncated binary
+        for (i = 0; i < k; i++) {
+            truncated_binary = truncated_binary | (c << (k - i));  // add in backwards order, since reading bits in backwards order
+            c = BitFileGetBit(stream);                             // get next bit
+        }
+        truncated_binary = truncated_binary | (c << (k - i));  // need to do it for the last bit
+    } else {
+        // read the unary portion, count number of 1's
+        while (c == 1) {
+            unary_count++;
+            c = BitFileGetBit(stream);
+        }
 
-		// printf("DEBUG: finished truncated binary only = %3d\n", truncated_binary);
-	}
-	else {
-		// printf("DEBUG: unary and truncated binary\n");
-		// read the unary portion, count number of 1's
-		while (c == 1){
-			unary_count++;
-			c = BitFileGetBit(stream);
-		}
+        // then read the truncated binary portion
+        for (i = 0; i < k; i++) {
+            truncated_binary = truncated_binary | (c << (k - i));  // add in backwards order, since reading bits in backwards order
+            c = BitFileGetBit(stream);                             // get next bit
+        }
+        truncated_binary = truncated_binary | (c << (k - i));  // need to do it for the last bit
+    }
 
-		// then read the truncated binary portion
-		for (i=0; i<k; i++){
-			truncated_binary = truncated_binary | (c << (k-i));	// add in backwards order, since reading bits in backwards order
-			c = BitFileGetBit(stream);	// get next bit
-		}
-		truncated_binary = truncated_binary | (c << (k-i));	// need to do it for the last bit
-	}
+    // calculate value
+    // printf("DEBUG: unary_count = %3d\n", unary_count);
+    decoded = pow(2, k) * unary_count + truncated_binary;
 
-	// calculate value
-	// printf("DEBUG: unary_count = %3d\n", unary_count);
-	decoded = pow(2,k)*unary_count + truncated_binary;
-
-	return decoded;
+    return decoded;
 }
 
+
+
+/* =============== checks ============== */
+
+/**
+ * @brief checks one encode operation
+ * 
+ */
 void check_single_encode(void) {
     unsigned int sample = 19;
     unsigned int k = 5;
@@ -217,6 +195,11 @@ void check_single_encode(void) {
     logger("INFO", "encoded sample uses %d bits\n", num_bits_used);
 }
 
+
+/**
+ * @brief checks 1 decode operation
+ * 
+ */
 void check_single_decode(void) {
     /**
      * ===== parameters =====
@@ -234,6 +217,11 @@ void check_single_decode(void) {
     logger("INFO:", "decoded: %d\n", decode_sample(code, k));
 }
 
+
+/**
+ * @brief encode, write to file, read from file, decode
+ * 
+ */
 void check_read_write_to_binary_file(void) {
     uint32_t sample = 242;
     unsigned int k = 6;
@@ -268,20 +256,23 @@ void check_read_write_to_binary_file(void) {
     fclose(fptr);
 }
 
-mymatrix *encode_rng_mymatrix(int nrows, int ncols, int min, int max, int k){
-    logger("INFO", "==== multiple encode ====\n");
 
-    // create random matrix data
-    mymatrix* matrix = random_matrix(nrows, ncols, min, max);
-    pretty_print_mat(matrix);
-    pretty_save_mat(matrix, "output/sample_mymatrix.txt");
+/**
+ * @brief given input matrix, write it to an output bitfile
+ * 
+ * @param mat 
+ * @param filename 
+ */
+void encode_mymatrix(mymatrix *mat, int k, char* filename) {
+    int nrows = mat->nrows;
+    int ncols = mat->ncols;
 
     // setup encoding parameters
     unsigned int num_bits_used;
 
     // setup bitfile
     FILE *outFile;
-    outFile = fopen("output/encoded.bin", "wb");
+    outFile = fopen(filename, "wb");
 
     bit_file_t *bOutFile; /* encoded output */
     bOutFile = MakeBitFile(outFile, BF_WRITE);
@@ -292,9 +283,10 @@ mymatrix *encode_rng_mymatrix(int nrows, int ncols, int min, int max, int k){
     uint32_t sample, code;
     for (i = 0; i < nrows; i++) {
         for (j = 0; j < ncols; j++) {
-            sample = mat_get(matrix, i, j);
-            code = encode_sample_optimized(sample, k, &num_bits_used);
+            sample = mat_get(mat, i, j);
+            code = encode_sample_optimized(sample, k, &num_bits_used);  // encode
 
+            // debugging to see sample and encoded value
             logger("DEBUG", "(%d, %d): sample=%3d | code=%-8x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
             print_binary_32(code);
 
@@ -304,13 +296,18 @@ mymatrix *encode_rng_mymatrix(int nrows, int ncols, int min, int max, int k){
              *     - breaks assumptions about binary file structure
              * falling back to use the singular BitFilePutBit() and looping through --> avoids padding issue
              */
+
+            // write to file all the bits used
             while (counter < num_bits_used) {
+                // write left-most bit first
+                // 0b1101 0010
+                //   ^ write this one first, then write the ones to the right
                 bit = (code >> (num_bits_used - 1 - counter)) & 0x1;
                 BitFilePutBit(bit, bOutFile);
 
-                counter++;  // increment counter
+                counter++;
             }
-            counter = 0;  // reset counter
+            counter = 0;
         }
     }
 
@@ -318,70 +315,88 @@ mymatrix *encode_rng_mymatrix(int nrows, int ncols, int min, int max, int k){
     BitFileFlushOutput(bOutFile, 1);
 
     fclose(outFile);
-    // gsl_matrix_int_free(matrix);
-    return matrix;
 }
 
 
+/**
+ * @brief read the encoded contents from a file using bitfile, and decode them
+ * 
+ * @param filename          encoded binary file
+ * @param k                 divisor control parameter M = 2^k
+ * @param decoded_array     decoded array put into unsigned 32-bit array for easy access
+ * @param decoded_size      input, number of samples is known a priori (from header file)
+ */
 void check_multiple_decode(char *filename, int k, uint32_t *decoded_array, uint32_t decoded_size) {
-	uint32_t counter = 0;  //  number of currently decoded samples, amount of samples is known a priori (aka in file header)
-	uint32_t decoded;
+    uint32_t counter = 0;  //  number of currently decoded samples, amount of samples is known a priori (aka in file header)
+    uint32_t decoded;
 
-	logger("INFO", "==== multiple decode ====\n");
-	bit_file_t *bfp;
+    logger("INFO", "==== multiple decode ====\n");
+    bit_file_t *bfp;
 
-	logger("INFO", "==== opening file using bitfile: %s ===\n", filename);
-	bfp = BitFileOpen(filename, BF_READ);
+    logger("INFO", "==== opening file using bitfile: %s ===\n", filename);
+    bfp = BitFileOpen(filename, BF_READ);
 
-	while (counter < decoded_size) {
-		decoded = decode_sample_bitfile(bfp, (unsigned int)k);
-		decoded_array[counter] = decoded;
-		logger("DEBUG", "decoded[%2d] = %3d\n", counter, decoded_array[counter]);
+    while (counter < decoded_size) {
+        decoded = decode_sample_bitfile(bfp, (unsigned int)k);
+        decoded_array[counter] = decoded;
+        logger("DEBUG", "decoded[%2d] = %3d\n", counter, decoded_array[counter]);
 
-		counter++;
-	}
+        counter++;
+    }
 
-	BitFileClose(bfp);
+    BitFileClose(bfp);
 }
 
+
+/* ================= helpers ================== */
+
+/**
+ * @brief read binary file and print contents one-by-one
+ * 
+ * @param filename 
+ */
 void view_binary_file(char *filename) {
-	int c;
-	FILE *fp;
-	logger("INFO", "==== reading file: %s ===\n", filename);
-	fp = fopen(filename, "r");
-	while (1) {
-		c = fgetc(fp);
-		if (feof(fp)) {
+    int c;
+    FILE *fp;
+    logger("INFO", "==== reading file: %s ===\n", filename);
+    fp = fopen(filename, "r");
+    while (1) {
+        c = fgetc(fp);
+        if (feof(fp)) {
             break;
-		}
-		logger("INFO", "%x\n", c);
-	}
-	fclose(fp);
+        }
+        logger("INFO", "%x\n", c);
+    }
+    fclose(fp);
 
-	logger("INFO", "\n==== end file ===\n");
+    logger("INFO", "\n==== end file ===\n");
 }
 
 
+/**
+ * @brief read binary file using bitfile library, and print contents one-by-one
+ * 
+ * @param filename 
+ */
 void view_binary_file_using_bitfile(char *filename) {
-	uint32_t i = 0;
-	bit_file_t *bfp;
-	int value;
+    uint32_t i = 0;
+    bit_file_t *bfp;
+    int value;
 
-	logger("INFO", "==== reading file using bitfile: %s ===\n", filename);
-	bfp = BitFileOpen(filename, BF_READ);
+    logger("INFO", "==== reading file using bitfile: %s ===\n", filename);
+    bfp = BitFileOpen(filename, BF_READ);
 
-	// read until end of file
-	while (1) {
-		value = BitFileGetBit(bfp);
-		if (value == EOF) {  // end of file
-			logger("INFO", "end of file\n");
-			return;
-		} 
-		else {
-			logger("INFO", "read bit [%2d] = %d\n", i, value);
-		}
-		i++;
-	}
-	logger("INFO", "\n==== end bitfile ===\n");
-	BitFileClose(bfp);
+    // read until end of file
+    while (1) {
+        value = BitFileGetBit(bfp);
+        if (value == EOF) {  // end of file
+            logger("INFO", "end of file\n");
+            return;
+        } else {
+            logger("INFO", "read bit [%2d] = %d\n", i, value);
+        }
+        i++;
+    }
+    logger("INFO", "\n==== end bitfile ===\n");
+    BitFileClose(bfp);
 }
