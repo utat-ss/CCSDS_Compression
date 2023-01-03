@@ -117,55 +117,7 @@ uint32_t decode_sample(uint32_t code, unsigned int k) {
     return ret;
 }
 
-
 /* ============= constant k: streaming encode and decode functions =========== */
-
-/**
- * @brief decodes one sample per function call, from an open bitfile handle
- *
- * @param stream        open bitfile handle, will be read continually
- * @param k             must know divisor size for decoding, M = 2^k, k control parameter
- * @return uint32_t     decoded sample, held in a unsigned 32-bit container
- */
-uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k) {
-    uint32_t decoded = 0;
-    uint32_t c;
-    uint32_t i = 0;
-    uint32_t unary_count = 0;
-    uint32_t truncated_binary = 0;
-
-    c = BitFileGetBit(stream);
-
-    // assume unary portion first
-    if (c == 0) {
-        // if first entry is 0, then the next k bits are the truncated binary
-        for (i = 0; i < k; i++) {
-            truncated_binary = truncated_binary | (c << (k - i));  // add in backwards order, since reading bits in backwards order
-            c = BitFileGetBit(stream);                             // get next bit
-        }
-        truncated_binary = truncated_binary | (c << (k - i));  // need to do it for the last bit
-    } else {
-        // read the unary portion, count number of 1's
-        while (c == 1) {
-            unary_count++;
-            c = BitFileGetBit(stream);
-        }
-
-        // then read the truncated binary portion
-        for (i = 0; i < k; i++) {
-            truncated_binary = truncated_binary | (c << (k - i));  // add in backwards order, since reading bits in backwards order
-            c = BitFileGetBit(stream);                             // get next bit
-        }
-        truncated_binary = truncated_binary | (c << (k - i));  // need to do it for the last bit
-    }
-
-    // calculate value
-    // printf("DEBUG: unary_count = %3d\n", unary_count);
-    decoded = pow(2, k) * unary_count + truncated_binary;
-
-    return decoded;
-}
-
 
 /**
  * @brief given input matrix, write it to an output bitfile
@@ -227,6 +179,52 @@ void encode_mymatrix(mymatrix *mat, int k, char *filename) {
     fclose(outFile);
 }
 
+/**
+ * @brief decodes one sample per function call, from an open bitfile handle
+ *
+ * @param stream        open bitfile handle, will be read continually
+ * @param k             must know divisor size for decoding, M = 2^k, k control parameter
+ * @return uint32_t     decoded sample, held in a unsigned 32-bit container
+ */
+uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k) {
+    uint32_t decoded = 0;
+    uint32_t c;
+    uint32_t i = 0;
+    uint32_t unary_count = 0;
+    uint32_t truncated_binary = 0;
+
+    c = BitFileGetBit(stream);
+
+    // assume unary portion first
+    if (c == 0) {
+        // if first entry is 0, then the next k bits are the truncated binary
+        for (i = 0; i < k; i++) {
+            truncated_binary = truncated_binary | (c << (k - i));  // add in backwards order, since reading bits in backwards order
+            c = BitFileGetBit(stream);                             // get next bit
+        }
+        truncated_binary = truncated_binary | (c << (k - i));  // need to do it for the last bit
+    } else {
+        // read the unary portion, count number of 1's
+        while (c == 1) {
+            unary_count++;
+            c = BitFileGetBit(stream);
+        }
+
+        // then read the truncated binary portion
+        for (i = 0; i < k; i++) {
+            truncated_binary = truncated_binary | (c << (k - i));  // add in backwards order, since reading bits in backwards order
+            c = BitFileGetBit(stream);                             // get next bit
+        }
+        truncated_binary = truncated_binary | (c << (k - i));  // need to do it for the last bit
+    }
+
+    // calculate value
+    // printf("DEBUG: unary_count = %3d\n", unary_count);
+    decoded = pow(2, k) * unary_count + truncated_binary;
+
+    return decoded;
+}
+
 /* ============ sample adaptive: streaming encode and decode functions ================== */
 void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
     int nrows = mat->nrows;
@@ -247,7 +245,8 @@ void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
     int bit = 0;
     int bit_counter = 0;
     unsigned int num_bits_used = D;
-    uint32_t sample, code;
+    uint32_t sample = mat_get_flat(mat, 0);
+    uint32_t code;
 
     // variables for sample adaptive
     int k = 0;  // k=0 for the first sample t=0
@@ -266,19 +265,10 @@ void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
 
             // for the first pixel, don't do the adaptive stuff
             // just write the sample directly
-            code = sample;
-            if (t != 0){
-                // ========= update sample adaptive variables =======
-                if (counter < pow(2, gamma_star) -1){
-                    counter = counter + 1;
-                    accum = accum + sample;
-                }
-                // rescaling update
-                else{
-                    counter = (counter+1)/2;
-                    accum = (accum + sample + 1)/2;
-                }
-
+            if (t == 0){
+                code = sample;
+            }
+            else{
                 // ====== compute value of k ========
                 limit = accum + (49 * counter) / pow(2,7);
                 limit_original = limit;
@@ -308,10 +298,21 @@ void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
             }
             bit_counter = 0;
 
+            // ========= update sample adaptive variables =======
+            if (counter < pow(2, gamma_star) - 1) {
+                counter = counter + 1;
+                accum = accum + sample;
+            }
+            // rescaling update
+            else {
+                counter = (counter + 1) / 2;
+                accum = (accum + sample + 1) / 2;
+            }
+
             // ====== debugging =========
-            logger("DEBUG", "(%d, %d): sample=%3d | code=%-8x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
-            print_binary_32(code);
-            logger("DEBUG", "counter=%3d \t accum=%3d \t k=%3d \t left_side=%3d \t limit=%3d\n",counter, accum, k, left_side, limit_original);
+            // logger("DEBUG", "(%d, %d): sample=%3d | code=%-8x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
+            // print_binary_32(code);
+            // logger("DEBUG", "counter=%3d \t accum=%3d \t k=%3d \t left_side=%3d \t limit=%3d\n",counter, accum, k, left_side, limit_original);
         }
     }
 
@@ -322,13 +323,74 @@ void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
 }
 
 
-mymatrix *adaptive_decode_bitfile(char *filename){
-    
+void adaptive_decode_bitfile(mymatrix* decoded_mat, char* filename) {
+    bit_file_t* stream = BitFileOpen(filename, BF_READ);
+
+    uint32_t decoded = 0;
+    int t=0;
+    unsigned int k = 0;
+    uint32_t c = 0;         // bit from reading bitfile
+
+    // adaptive variables
+    int counter = pow(2, gamma_o);
+    int accum = ((3 * pow(2, gamma_o + 6) - 49) * counter) / (pow(2, 7));
+    int limit = 0;
+
+    // debugging
+    int left_side = 0;
+    int limit_original = 0;
+
+    for (int i=0; i<decoded_mat->nrows; i++){
+        for (int j=0; j<decoded_mat->ncols; j++){
+            t = (i * decoded_mat->ncols) + j;
+
+            // the first pixel is unencoded, read it directly
+            if (t==0){
+                // read first D bits
+                for (int ii=0; ii<D; ii++){
+                    c = BitFileGetBit(stream);
+                    // logger("DEBUG", "c=%d\n", c);
+                    decoded = decoded | (c << (D - ii - 1));
+                }
+                
+            }
+            // the rest of the pixels are adaptively encoded
+            else{
+                // ========= compute value of k =========
+                limit = accum + (49 * counter) / pow(2, 7);
+                limit_original = limit;
+                k = 0;
+                while (counter <= limit) {
+                    k = k + 1;
+                    limit = limit >> 1;  // shift right is divide by 2
+                }
+                k = k - 1;  // went over the limit to exit the while loop, need to subtract 1
+
+                left_side = counter*pow(2,k);
+                assert(left_side <= limit_original);
+
+                decoded = decode_sample_bitfile(stream, k);
+            }
+
+            // ======= update statistics =========
+            if (counter < pow(2, gamma_star) - 1) {
+                counter = counter + 1;
+                accum = accum + decoded;
+            }
+            // rescaling update
+            else {
+                counter = (counter + 1) / 2;
+                accum = (accum + decoded + 1) / 2;
+            }
+
+            // =========== set value =========
+            mat_set(decoded_mat, i, j, (float)decoded);
+
+            // ======= debugging ===========
+            // logger("DEBUG", "counter=%3d \t accum=%3d \t k=%3d \t left_side=%3d \t limit=%3d\n", counter, accum, k, left_side, limit_original);
+        }
+    }
 }
-
-
-
-
 
 /* =============== checks ============== */
 

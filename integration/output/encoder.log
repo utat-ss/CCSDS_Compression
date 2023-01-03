@@ -1,8 +1,2 @@
 starting log
-Tue Jan  3 16:13:15 2023 [INFO]: parameter k = 7
-Tue Jan  3 16:13:15 2023 [DEBUG]: (0, 0): sample=250 | code=fa       | num_bits_used= 14
-Tue Jan  3 16:13:15 2023 [DEBUG]: bin = 00000000 00000000 00000000 11111010,
-Tue Jan  3 16:13:15 2023 [DEBUG]: counter=  4 	 accum= 22 	 k=  0 	 left_side=  0 	 limit=  0
-Tue Jan  3 16:13:15 2023 [DEBUG]: (0, 1): sample= 19 | code=33       | num_bits_used=  6
-Tue Jan  3 16:13:15 2023 [DEBUG]: bin = 00000000 00000000 00000000 00110011,
-Tue Jan  3 16:13:15 2023 [DEBUG]: counter=  5 	 accum= 41 	 k=  3 	 left_side= 40 	 limit= 42
+Tue Jan  3 17:57:40 2023 [INFO]: parameter k = 7

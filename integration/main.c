@@ -67,12 +67,18 @@ int main(int argc, char* argv[]){
     pretty_print_mat(matrix);
     pretty_save_mat(matrix, "output/sample_mymatrix.txt");
 
+    // encode
     adaptive_encode_mymatrix(matrix, "output/encoded.bin");
     // encode_mymatrix(matrix, k, "output/encoded.bin");
     // view_binary_file("output/encoded.bin");
     // view_binary_file_using_bitfile("output/encoded.bin");
 
     // decode
+    mymatrix* decoded_mat = create_matrix(nrows, ncols);
+    adaptive_decode_bitfile(decoded_mat, "output/encoded.bin");
+    pretty_print_mat(decoded_mat);
+    pretty_save_mat(decoded_mat, "output/decoded_mymatrix.txt");
+
     // uint32_t* decoded_array = (uint32_t*) malloc(sizeof(uint32_t) * nrows*ncols);
     // check_multiple_decode("output/encoded.bin", k, decoded_array, nrows*ncols);
 
