@@ -1,10 +1,12 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "mymatrix.h"
 #include "logger.h"
 
+/* ============ constructors ================== */
 // TODO: make it work without malloc
 mymatrix* create_matrix(int nrows, int ncols){
     mymatrix* mat = (mymatrix*) malloc(sizeof(mymatrix));
@@ -42,6 +44,18 @@ myvector* random_vector(int size, int min, int max){
     return vec;
 }
 
+/* ============= deconstructors =========== */
+void del_matrix(mymatrix* mat) {
+    free(mat->data);
+    free(mat);
+}
+
+void del_vector(myvector* vec) {
+    free(vec->data);
+    free(vec);
+}
+
+/* ============ getters ================== */
 
 // getters, assume row major format
 float mat_get(mymatrix* mat, int i, int j){
@@ -59,8 +73,23 @@ float mat_get(mymatrix* mat, int i, int j){
     }
 
     // no errors
-    return mat->data[i * mat->nrows + j];
+    return mat->data[i * mat->ncols + j];
 }
+
+float mat_get_flat(mymatrix* mat, int i){
+    if (mat == NULL) {
+        logger("ERROR", "matrix is null");
+        return -1;
+    } else if (i > (mat->nrows * mat->ncols)) {
+        logger("ERROR", "out of range, matrix size is (%d, %d) = %d, trying to access element=%d", \
+                mat->nrows, mat->ncols, (mat->nrows * mat->ncols), i);
+        return -1;
+    }
+    else{
+        return mat->data[i];
+    }
+}
+
 
 
 float vec_get(myvector* vec, int i){
@@ -76,17 +105,20 @@ float vec_get(myvector* vec, int i){
     return vec->data[i];
 }
 
-// setters, assume row major
+
+/* ============ setters ================== */
+
+// assume row major
 void mat_set(mymatrix* mat, int i, int j, float val){
-    mat->data[i * mat->nrows + j] = val;
+    mat->data[i * mat->ncols + j] = val;
 }
 
 void vec_set(myvector* vec, int i, float val){
     vec->data[i] = val;
 }
 
+/* ============ display ================== */
 
-// display
 void pretty_print_mat(mymatrix* mat) {
     int nrow = (int)mat->nrows;
     int ncol = (int)mat->ncols;
@@ -117,8 +149,8 @@ void pretty_print_vec(myvector* vec) {
 }
 
 
-// saving
-void pretty_save_mat(mymatrix* mat, char* filepath){
+/* ============ saving ================== */
+void pretty_save_mat(mymatrix* mat, char* filepath) {
     FILE* fptr;
     fptr = fopen(filepath, "w");
 
@@ -156,7 +188,7 @@ void pretty_save_vec(myvector* vec, char* filepath){
     fclose(fptr);
 }
 
-// math
+// ============= math ================
 float vec_dot_prod(myvector* vecA, myvector* vecB){
     float result = 0;
 
@@ -169,4 +201,62 @@ float vec_dot_prod(myvector* vecA, myvector* vecB){
     }
 
     return result;
+}
+
+myvector* mat_vec_mult(mymatrix* mat, myvector* vec) {
+    assert(vec->size == mat->ncols);
+
+    myvector* out_vec = create_vector(vec->size);
+
+    float inner_product = 0;
+    for (int i = 0; i < vec->size; i++) {
+        for (int j = 0; j < vec->size; j++) {
+            // loop through j = columns of mat first, then go to next row (i)
+            // mat_vec is O(N^2) operation
+            inner_product += mat_get(mat, i, j) * vec_get(vec, j);
+        }
+        vec_set(out_vec, i, inner_product);
+        inner_product = 0;
+    }
+
+    return out_vec;
+}
+
+mymatrix* mat_mat_mult(mymatrix* matA, mymatrix* matB) {
+    assert(matA->nrows == matB->ncols);
+
+    mymatrix* out_mat = create_matrix(matA->nrows, matB->ncols);
+
+    float inner_product = 0;
+    for (int i = 0; i < matA->nrows; i++) {      // rows of A
+        for (int j = 0; j < matA->ncols; j++) {  // columns of B
+            // inner product i-th row of A with j-th column of B
+            for (int k = 0; k < matB->ncols; k++) {
+                inner_product += mat_get(matA, i, k) * mat_get(matB, k, j);
+            }
+
+            // set result of inner product to the new (i,j) matrix element
+            mat_set(out_mat, i, j, inner_product);
+            inner_product = 0;
+        }
+    }
+
+    return out_mat;
+}
+
+/* =============== checks ============== */
+void check_mymatrix(void){
+    myvector* vecA = random_vector(3, -5,5);
+    myvector* vecB = random_vector(3, -5,5);
+    pretty_print_vec(vecA);
+    pretty_print_vec(vecB);
+
+    float result = 0.0;
+    result = vec_dot_prod(vecA, vecB);
+    printf("result %f\n", result);
+
+    mymatrix* mat = random_matrix(5,5,0,10);
+    pretty_save_mat(mat, "output/random_matrix.txt");
+    pretty_save_vec(vecA, "output/random_vectorA.txt");
+    pretty_save_vec(vecB, "output/random_vectorB.txt");
 }

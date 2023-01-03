@@ -14,15 +14,34 @@
 
 #include "bitfile.h"
 #include "mymatrix.h"
+#include "../main.h"
+
+
+// initial count exponent
+// set initial value of counter
+// range [1,8]
+#define gamma_o         2
+
+// initial accumulator initialization constant
+// range [0, D-2]
+#define accum_init_k    3
+
+// rescaling counter sizes
+// range max(4, gamma_o+1) <= gamma_star <= 11
+#define gamma_star      6
 
 
 // single encode and decode functions
 uint32_t encode_sample_optimized(uint32_t sample, unsigned int k, unsigned int *num_bits_used);
 uint32_t decode_sample(uint32_t code, unsigned int k);
 
-// streaming encode and decode functions
+// constant k: streaming encode and decode functions
 void encode_mymatrix(mymatrix *mat, int k, char* filename);
 uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k);
+
+// sample adaptive: streaming encode and decode functions
+void adaptive_encode_mymatrix(mymatrix* mat, char* filename);
+mymatrix* adaptive_decode_bitfile(char* filename);
 
 // checks
 void check_single_encode(void);

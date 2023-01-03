@@ -67,27 +67,14 @@ int main(int argc, char* argv[]){
     pretty_print_mat(matrix);
     pretty_save_mat(matrix, "output/sample_mymatrix.txt");
 
-    encode_mymatrix(matrix, k, "output/encoded.bin");
+    adaptive_encode_mymatrix(matrix, "output/encoded.bin");
+    // encode_mymatrix(matrix, k, "output/encoded.bin");
     // view_binary_file("output/encoded.bin");
     // view_binary_file_using_bitfile("output/encoded.bin");
 
     // decode
-    uint32_t* decoded_array = (uint32_t*) malloc(sizeof(uint32_t) * nrows*ncols);
-    check_multiple_decode("output/encoded.bin", k, decoded_array, nrows*ncols);
-
-    // myvector* vecA = random_vector(3, -5,5);
-    // myvector* vecB = random_vector(3, -5,5);
-    // pretty_print_vec(vecA);
-    // pretty_print_vec(vecB);
-
-    // float result = 0.0;
-    // result = vec_dot_prod(vecA, vecB);
-    // printf("result %f\n", result);
-
-    // mymatrix* mat = random_matrix(5,5,0,10);
-    // pretty_save_mat(mat, "output/random_matrix.txt");
-    // pretty_save_vec(vecA, "output/random_vectorA.txt");
-    // pretty_save_vec(vecB, "output/random_vectorB.txt");
+    // uint32_t* decoded_array = (uint32_t*) malloc(sizeof(uint32_t) * nrows*ncols);
+    // check_multiple_decode("output/encoded.bin", k, decoded_array, nrows*ncols);
 
     logger_finalize();
     

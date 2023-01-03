@@ -7,12 +7,11 @@
  */
 #include <math.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "encoder.h"
 #include "logger.h"
 #include "mymatrix.h"
-
-
 
 /* ============= single encode and decode functions =========== */
 
@@ -119,7 +118,7 @@ uint32_t decode_sample(uint32_t code, unsigned int k) {
 }
 
 
-/* ============= streaming encode and decode functions =========== */
+/* ============= constant k: streaming encode and decode functions =========== */
 
 /**
  * @brief decodes one sample per function call, from an open bitfile handle
@@ -166,6 +165,168 @@ uint32_t decode_sample_bitfile(bit_file_t *stream, unsigned int k) {
 
     return decoded;
 }
+
+
+/**
+ * @brief given input matrix, write it to an output bitfile
+ *
+ * @param mat
+ * @param filename
+ */
+void encode_mymatrix(mymatrix *mat, int k, char *filename) {
+    int nrows = mat->nrows;
+    int ncols = mat->ncols;
+
+    // setup encoding parameters
+    unsigned int num_bits_used;
+
+    // setup bitfile
+    FILE *outFile;
+    outFile = fopen(filename, "wb");
+
+    bit_file_t *bOutFile; /* encoded output */
+    bOutFile = MakeBitFile(outFile, BF_WRITE);
+
+    int i, j;
+    int bit = 0;
+    int counter = 0;
+    uint32_t sample, code;
+    for (i = 0; i < nrows; i++) {
+        for (j = 0; j < ncols; j++) {
+            sample = mat_get(mat, i, j);
+            code = encode_sample_optimized(sample, k, &num_bits_used);  // encode
+
+            // debugging to see sample and encoded value
+            logger("DEBUG", "(%d, %d): sample=%3d | code=%-8x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
+            print_binary_32(code);
+
+            /**
+             * Yong Da Li, Saturday, July 16, 2022
+             * note that the bitfile library BitFilePutBits() (plural) gives some weird padding issue
+             *     - breaks assumptions about binary file structure
+             * falling back to use the singular BitFilePutBit() and looping through --> avoids padding issue
+             */
+
+            // write to file all the bits used
+            while (counter < num_bits_used) {
+                // write left-most bit first
+                // 0b1101 0010
+                //   ^ write this one first, then write the ones to the right
+                bit = (code >> (num_bits_used - 1 - counter)) & 0x1;
+                BitFilePutBit(bit, bOutFile);
+
+                counter++;
+            }
+            counter = 0;
+        }
+    }
+
+    /* pad fill with 1s so decode will run into EOF */
+    BitFileFlushOutput(bOutFile, 1);
+
+    fclose(outFile);
+}
+
+/* ============ sample adaptive: streaming encode and decode functions ================== */
+void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
+    int nrows = mat->nrows;
+    int ncols = mat->ncols;
+
+    // setup encoding parameters
+
+    // setup bitfile
+    FILE *outFile;
+    outFile = fopen(filename, "wb");
+
+    bit_file_t *bOutFile; /* encoded output */
+    bOutFile = MakeBitFile(outFile, BF_WRITE);
+
+    // variables for normal encoder
+    int i, j;
+    int t = 0;  // sample index, using `t` to match CCSDS123 documentation
+    int bit = 0;
+    int bit_counter = 0;
+    unsigned int num_bits_used = D;
+    uint32_t sample, code;
+
+    // variables for sample adaptive
+    int k = 0;  // k=0 for the first sample t=0
+    int counter =  pow(2, gamma_o);
+    int accum = ((3 * pow(2, gamma_o+6) - 49) * counter) / (pow(2,7));
+    int limit = 0;
+
+    // debugging
+    int limit_original = 0;     // copy of right side of equality
+    int left_side = 0;          // left side of equality for k
+
+    for (i = 0; i < nrows; i++) {
+        for (j = 0; j < ncols; j++) {
+            t = (i * mat->ncols) + j;
+            sample = mat_get_flat(mat, t);
+
+            // for the first pixel, don't do the adaptive stuff
+            // just write the sample directly
+            code = sample;
+            if (t != 0){
+                // ========= update sample adaptive variables =======
+                if (counter < pow(2, gamma_star) -1){
+                    counter = counter + 1;
+                    accum = accum + sample;
+                }
+                // rescaling update
+                else{
+                    counter = (counter+1)/2;
+                    accum = (accum + sample + 1)/2;
+                }
+
+                // ====== compute value of k ========
+                limit = accum + (49 * counter) / pow(2,7);
+                limit_original = limit;
+                k = 0;
+                while (counter <= limit){
+                    k = k+1;
+                    limit = limit >> 1; // shift right is divide by 2
+                }
+                k = k-1;    // went over the limit to exit the while loop, need to subtract 1
+                left_side = counter*pow(2,k);
+                assert(left_side<= limit_original);
+
+                // =========== encode ==========
+                code = encode_sample_optimized(sample, k, &num_bits_used);
+            }
+            
+
+            // ========== write code to bitfile ==========
+            while (bit_counter < num_bits_used) {
+                // write left-most bit first
+                // 0b1101 0010
+                //   ^ write this one first, then write the ones to the right
+                bit = (code >> (num_bits_used - 1 - bit_counter)) & 0x1;
+                BitFilePutBit(bit, bOutFile);
+
+                bit_counter++;
+            }
+            bit_counter = 0;
+
+            // ====== debugging =========
+            logger("DEBUG", "(%d, %d): sample=%3d | code=%-8x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
+            print_binary_32(code);
+            logger("DEBUG", "counter=%3d \t accum=%3d \t k=%3d \t left_side=%3d \t limit=%3d\n",counter, accum, k, left_side, limit_original);
+        }
+    }
+
+    /* pad fill with 1s so decode will run into EOF */
+    BitFileFlushOutput(bOutFile, 1);
+
+    fclose(outFile);
+}
+
+
+mymatrix *adaptive_decode_bitfile(char *filename){
+    
+}
+
+
 
 
 
@@ -254,67 +415,6 @@ void check_read_write_to_binary_file(void) {
     printf("read:\t\t");
     print_binary_32(read_code);
     fclose(fptr);
-}
-
-
-/**
- * @brief given input matrix, write it to an output bitfile
- * 
- * @param mat 
- * @param filename 
- */
-void encode_mymatrix(mymatrix *mat, int k, char* filename) {
-    int nrows = mat->nrows;
-    int ncols = mat->ncols;
-
-    // setup encoding parameters
-    unsigned int num_bits_used;
-
-    // setup bitfile
-    FILE *outFile;
-    outFile = fopen(filename, "wb");
-
-    bit_file_t *bOutFile; /* encoded output */
-    bOutFile = MakeBitFile(outFile, BF_WRITE);
-
-    int i, j;
-    int bit = 0;
-    int counter = 0;
-    uint32_t sample, code;
-    for (i = 0; i < nrows; i++) {
-        for (j = 0; j < ncols; j++) {
-            sample = mat_get(mat, i, j);
-            code = encode_sample_optimized(sample, k, &num_bits_used);  // encode
-
-            // debugging to see sample and encoded value
-            logger("DEBUG", "(%d, %d): sample=%3d | code=%-8x | num_bits_used=%3d\n", i, j, sample, code, num_bits_used);
-            print_binary_32(code);
-
-            /**
-             * Yong Da Li, Saturday, July 16, 2022
-             * note that the bitfile library BitFilePutBits() (plural) gives some weird padding issue
-             *     - breaks assumptions about binary file structure
-             * falling back to use the singular BitFilePutBit() and looping through --> avoids padding issue
-             */
-
-            // write to file all the bits used
-            while (counter < num_bits_used) {
-                // write left-most bit first
-                // 0b1101 0010
-                //   ^ write this one first, then write the ones to the right
-                bit = (code >> (num_bits_used - 1 - counter)) & 0x1;
-                BitFilePutBit(bit, bOutFile);
-
-                counter++;
-            }
-            counter = 0;
-        }
-    }
-
-    /* pad fill with 1s so decode will run into EOF */
-    BitFileFlushOutput(bOutFile, 1);
-
-    fclose(outFile);
 }
 
 

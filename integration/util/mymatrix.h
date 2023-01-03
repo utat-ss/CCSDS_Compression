@@ -26,6 +26,7 @@ typedef struct myvector{
     float* data;
 } myvector;
 
+
 // constructors
 mymatrix* create_matrix(int nrows, int ncols);
 myvector* create_vector(int size);
@@ -33,11 +34,16 @@ myvector* create_vector(int size);
 mymatrix* random_matrix(int nrows, int ncols, int min, int max);
 myvector* random_vector(int size, int min, int max);
 
+// deconstructors
+void del_matrix(mymatrix* mat);
+void del_vector(myvector* vec);
 
-// accessors
+// getters
 float mat_get(mymatrix* mat, int i, int j);
+float mat_get_flat(mymatrix* mat, int i);
 float vec_get(myvector* vec, int i);
 
+// setters
 void mat_set(mymatrix* mat, int i, int j, float val);
 void vec_set(myvector* vec, int i, float val);
 
@@ -51,5 +57,10 @@ void pretty_save_vec(myvector* vec, char* filepath);
 
 // math
 float vec_dot_prod(myvector* vecA, myvector* vecB);
+myvector* mat_vec_mult(mymatrix* mat, myvector* vec);
+mymatrix* mat_mat_mult(mymatrix* matA, mymatrix* matB);
+
+// checks
+void check_mymatrix(void);
 
 #endif /* MYMATRIX_H */

@@ -7,6 +7,13 @@ Yong Da Li
 - or `hexdump -C <binary_file>`
     - `-C` = canonical, always get consistent byte-by-byte output regardless of your system's endianness
 
+## writing to bitfile
+Yong Da Li, Saturday, July 16, 2022
+- note that the bitfile library BitFilePutBits() (plural) gives some weird padding issue
+  - breaks assumptions about binary file structure
+  - falling back to use the singular BitFilePutBit() and looping through --> avoids padding issue
+
+
 ## Saturday, December 29, 2022
 
 

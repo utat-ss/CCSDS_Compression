@@ -1,16 +1,8 @@
 starting log
-Thu Dec 29 17:13:03 2022 [INFO]: parameter k = 7
-Thu Dec 29 17:13:03 2022 [DEBUG]: (0, 0): sample= 93 | code=5d       | num_bits_used=  8
-Thu Dec 29 17:13:03 2022 [DEBUG]: bin = 00000000 00000000 00000000 01011101,
-Thu Dec 29 17:13:03 2022 [DEBUG]: (0, 1): sample=247 | code=177      | num_bits_used=  9
-Thu Dec 29 17:13:03 2022 [DEBUG]: bin = 00000000 00000000 00000001 01110111,
-Thu Dec 29 17:13:03 2022 [DEBUG]: (1, 0): sample= 33 | code=21       | num_bits_used=  8
-Thu Dec 29 17:13:03 2022 [DEBUG]: bin = 00000000 00000000 00000000 00100001,
-Thu Dec 29 17:13:03 2022 [DEBUG]: (1, 1): sample= 76 | code=4c       | num_bits_used=  8
-Thu Dec 29 17:13:03 2022 [DEBUG]: bin = 00000000 00000000 00000000 01001100,
-Thu Dec 29 17:13:03 2022 [INFO]: ==== multiple decode ====
-Thu Dec 29 17:13:03 2022 [INFO]: ==== opening file using bitfile: output/encoded.bin ===
-Thu Dec 29 17:13:03 2022 [DEBUG]: decoded[ 0] =  93
-Thu Dec 29 17:13:03 2022 [DEBUG]: decoded[ 1] = 247
-Thu Dec 29 17:13:03 2022 [DEBUG]: decoded[ 2] =  33
-Thu Dec 29 17:13:03 2022 [DEBUG]: decoded[ 3] =  76
+Tue Jan  3 16:13:15 2023 [INFO]: parameter k = 7
+Tue Jan  3 16:13:15 2023 [DEBUG]: (0, 0): sample=250 | code=fa       | num_bits_used= 14
+Tue Jan  3 16:13:15 2023 [DEBUG]: bin = 00000000 00000000 00000000 11111010,
+Tue Jan  3 16:13:15 2023 [DEBUG]: counter=  4 	 accum= 22 	 k=  0 	 left_side=  0 	 limit=  0
+Tue Jan  3 16:13:15 2023 [DEBUG]: (0, 1): sample= 19 | code=33       | num_bits_used=  6
+Tue Jan  3 16:13:15 2023 [DEBUG]: bin = 00000000 00000000 00000000 00110011,
+Tue Jan  3 16:13:15 2023 [DEBUG]: counter=  5 	 accum= 41 	 k=  3 	 left_side= 40 	 limit= 42
