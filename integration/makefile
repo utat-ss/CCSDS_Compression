@@ -1,7 +1,9 @@
 CC = gcc	# compiler
 LD = gcc	# linker
-CFLAGS = -Wall -I/usr/local/include -Iutil -I -g -c	# compiler flags
-LDFLAGS = 	# linker flags
+
+# make sure to have `-g` debug flag at the end or else it won't have debugging symbols
+CFLAGS = -I/usr/local/include -Iutil -I -Wall -g -c	# compiler flags
+LDFLAGS = -g # linker flags
 # LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
 LIBS = -lm
 
@@ -25,7 +27,7 @@ all: main.out
 
 # link all objects together into single executable
 main.out: $(OBJECTS)
-	$(LD) $^ $(LDFLAGS) $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
 # for every item in objects list, it depends on the *.o -> *.c version of the code
 $(OBJECTS): %.o:%.c
@@ -41,12 +43,4 @@ $(OBJECTS): %.o:%.c
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(DEPENDENCIES)
-
-run: main.out
-	./$<
-
-debug: main.out
-	gdb $<
-
-test: test.out
-	./$<
+	rm *.out
