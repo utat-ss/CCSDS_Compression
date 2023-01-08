@@ -128,6 +128,18 @@ void mat_set(mymatrix* mat, int i, int j, float val){
     mat->data[i * mat->ncols + j] = val;
 }
 
+/**
+ * @brief set the value directly at index `i` in the flat array
+ * 
+ * @param mat 
+ * @param i 
+ * @param val 
+ */
+void mat_set_flat(mymatrix* mat, int i, float val){
+    assert(i< (mat->ncols)*(mat->nrows));
+    mat->data[i] = val;
+}
+
 void vec_set(myvector* vec, int i, float val){
     vec->data[i] = val;
 }

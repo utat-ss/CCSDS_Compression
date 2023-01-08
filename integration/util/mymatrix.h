@@ -47,6 +47,7 @@ float vec_get(myvector* vec, int i);
 
 // setters
 void mat_set(mymatrix* mat, int i, int j, float val);
+void mat_set_flat(mymatrix* mat, int i, float val);
 void vec_set(myvector* vec, int i, float val);
 
 // display

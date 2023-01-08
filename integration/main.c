@@ -88,11 +88,15 @@ void check_encoder(int argc, char* argv[]){
     // check_multiple_decode("output/encoded.bin", k, decoded_array, nrows*ncols);
 
     logger_finalize();
+
+    return;
 }
 
 void check_mymatrix_operations(void) {
     int nrows = 2;
     int ncols = 2;
+
+    logger_init("output/check_mymatrix_operations.log");
 
     // test matrix * matrix
     mymatrix* mat_identity = identity_matrix(nrows, ncols);
@@ -129,6 +133,10 @@ void check_mymatrix_operations(void) {
     del_matrix(mat_mat_mult_result);
     del_vector(vec_rand);
     del_vector(mat_vec_mult_result);
+
+    logger_finalize();
+
+    return;
 }
 
 
@@ -138,6 +146,9 @@ void check_datacube(int argc, char* argv[]){
         printf("usage is 3 numbers: <depth> <nrows> <ncols>\n");
         return;
     }
+
+    logger_init("output/check_datacube.log");
+
     // convert from string to integer
     int depth = atoi(argv[1]);
     int nrows = atoi(argv[2]);
@@ -151,6 +162,16 @@ void check_datacube(int argc, char* argv[]){
 
     char* filepath = "output/random_datacube.txt";
     pretty_save_cube(cube, filepath);
+
+    filepath = "output/random_datacube_formatted.txt";
+    printf("saved to file: %s\n", filepath);
+    save_cube(cube, filepath);
+
+    datacube* read_cube = parse_cube_from_file(filepath);
+    printf("read from file: %s\n", filepath);
+    pretty_print_cube(read_cube);
+
+    logger_finalize();
 
     return;
 }

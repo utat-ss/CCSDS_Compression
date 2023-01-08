@@ -3,6 +3,9 @@
 
 #include "mymatrix.h"
 
+// maximum row length for reading data
+#define MAXCHAR 1000
+
 typedef struct datacube{
     int depth;
     int nrows;
@@ -20,9 +23,14 @@ void del_datacube(datacube* cube);
 // ========== accessors ==============
 float cube_get(datacube* cube, int z, int x, int y);
 void cube_set(datacube* cube, int z, int x, int y, float val);
+void cube_set_flat(datacube* cube, int z, int x, float val);
 
 // ========== display and printing =========
 void pretty_print_cube(datacube* cube);
 void pretty_save_cube(datacube* cube, char* filepath);
+void save_cube(datacube* cube, char* filepath);
+
+// ========== parsing =========
+datacube* parse_cube_from_file(char* filepath);
 
 #endif /* DATACUBE_H */
