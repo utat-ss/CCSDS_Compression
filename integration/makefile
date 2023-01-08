@@ -12,7 +12,8 @@ SOURCES :=	\
 	encoder/encoder.c	\
 	util/bitfile.c		\
 	util/logger.c		\
-	util/mymatrix.c	\
+	util/mymatrix.c		\
+	util/datacube.c 	\
 
 HEADERS := $(SOURCES:.c=.h)
 OBJECTS := $(SOURCES:.c=.o)

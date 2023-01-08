@@ -16,6 +16,7 @@
 #include "util/bitfile.h"
 #include "util/logger.h"
 #include "util/mymatrix.h"
+#include "util/datacube.h"
 #include "encoder/encoder.h"
 #include "main.h"
 
@@ -41,23 +42,27 @@
  */
 
 
-int main(int argc, char* argv[]){
+void check_encoder(int argc, char* argv[]){
+    printf("=============\n");
+    printf("check encoder\n");
+    printf("=============\n");
+
     logger_init("output/encoder.log");
     srand((unsigned int)time(NULL));  // init random
     // check_single_encode();
     // check_single_decode();
     // check_read_write_to_binary_file();
 
-    if (argc != 3){
+    if (argc != 3) {
         printf("usage is [number of rows], [number of columns], expect 2 arguments\n");
-        return -1;
+        return;
     }
-    
+
     // convert from string to integer
     int nrows = atoi(argv[1]);
     int ncols = atoi(argv[2]);
     int min = 0;
-    int max = min + (int)pow(2,8);
+    int max = min + (int)pow(2, 8);
     // int range = 100;
     int k = 7;
     logger("INFO", "parameter k = %d\n", k);
@@ -83,6 +88,77 @@ int main(int argc, char* argv[]){
     // check_multiple_decode("output/encoded.bin", k, decoded_array, nrows*ncols);
 
     logger_finalize();
+}
+
+void check_mymatrix_operations(void) {
+    int nrows = 2;
+    int ncols = 2;
+
+    // test matrix * matrix
+    mymatrix* mat_identity = identity_matrix(nrows, ncols);
+    mymatrix* mat_rand = random_matrix(nrows, ncols, 0, 10);
+
+    mymatrix* mat_mat_mult_result = mat_mat_mult(mat_identity, mat_rand);
+
+    printf("identity\n");
+    pretty_print_mat(mat_identity);
+
+    printf("rand\n");
+    pretty_print_mat(mat_rand);
+
+    printf("mat mat mult result\n");
+    pretty_print_mat(mat_mat_mult_result);
+
+    // test matrix * vector
+    printf("\n============\n");
+    myvector* vec_rand = random_vector(ncols, 0, 10);
+    myvector* mat_vec_mult_result = mat_vec_mult(mat_rand, vec_rand);
+
+    printf("mat rand\n");
+    pretty_print_mat(mat_rand);
+
+    printf("vector random\n");
+    pretty_print_vec(vec_rand);
+
+    printf("mat vec mult result\n");
+    pretty_print_vec(mat_vec_mult_result);
+
+    // clean up
+    del_matrix(mat_identity);
+    del_matrix(mat_rand);
+    del_matrix(mat_mat_mult_result);
+    del_vector(vec_rand);
+    del_vector(mat_vec_mult_result);
+}
+
+
+void check_datacube(int argc, char* argv[]){
+    if (argc !=4){
+        printf("check datacube function:\n");
+        printf("usage is 3 numbers: <depth> <nrows> <ncols>\n");
+        return;
+    }
+    // convert from string to integer
+    int depth = atoi(argv[1]);
+    int nrows = atoi(argv[2]);
+    int ncols = atoi(argv[3]);
+
+    // locally defined
+    int min = 0;
+    int max = 10;
+    datacube* cube = random_datacube(depth, nrows, ncols, min, max);
+    pretty_print_cube(cube);
+
+    char* filepath = "output/random_datacube.txt";
+    pretty_save_cube(cube, filepath);
+
+    return;
+}
+
+int main(int argc, char* argv[]){
+    // check_encoder(argc, argv);
+    // check_mymatrix_operations();
+    check_datacube(argc, argv);
     
     return 0;
 }

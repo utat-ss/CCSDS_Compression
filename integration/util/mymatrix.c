@@ -44,6 +44,21 @@ myvector* random_vector(int size, int min, int max){
     return vec;
 }
 
+mymatrix* identity_matrix(int nrows, int ncols) {
+    mymatrix* mat = create_matrix(nrows, ncols);
+    for (int i = 0; i < nrows; i++) {
+        for (int j = 0; j < ncols; j++) {
+            if (i == j) {
+                mat_set(mat, i, j, 1);
+            } else {
+                mat_set(mat, i, j, 0);
+            }
+        }
+    }
+    return mat;
+}
+
+
 /* ============= deconstructors =========== */
 void del_matrix(mymatrix* mat) {
     free(mat->data);
