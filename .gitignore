@@ -1,8 +1,15 @@
+# editor caches
 *.DS_Store
 *.pyc
+*.vscode
+
+# compile objects
 *.o
 *.out
 *.d
 
+# debugging and quick testing
 *temp/
-*.vscode
+
+# output
+output/*
