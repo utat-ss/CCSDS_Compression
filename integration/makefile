@@ -9,11 +9,12 @@ LIBS = -lm
 
 SOURCES :=	\
 	main.c	\
-	encoder/encoder.c	\
-	util/bitfile.c		\
-	util/logger.c		\
-	util/mymatrix.c		\
-	util/datacube.c 	\
+	encoder/encoder.c		\
+	predictor/predictor.c 	\
+	util/bitfile.c			\
+	util/logger.c			\
+	util/mymatrix.c			\
+	util/datacube.c 		\
 
 HEADERS := $(SOURCES:.c=.h)
 OBJECTS := $(SOURCES:.c=.o)
@@ -45,3 +46,9 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f $(DEPENDENCIES)
 	rm *.out
+
+.PHONY: dumpvars
+dumpvars:	
+	$(info $$OBJECTS is [${OBJECTS}])
+	$(info $$DEPENDENCIES is [${DEPENDENCIES}])
+

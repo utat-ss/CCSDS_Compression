@@ -1,0 +1,14 @@
+===== datacube start ===== 
+depth=2, nrows=4, ncols=1z=0: ----- matrix ----- 
+size: 4 x 1 = 4
+3.000 
+6.000 
+7.000 
+5.000 
+z=1: ----- matrix ----- 
+size: 4 x 1 = 4
+3.000 
+5.000 
+6.000 
+2.000 
+===== datacube end ===== 

@@ -35,6 +35,7 @@ mymatrix* random_matrix(int nrows, int ncols, int min, int max);
 myvector* random_vector(int size, int min, int max);
 
 mymatrix* identity_matrix(int nrows, int ncols);
+mymatrix* ordered_matrix(int nrows, int ncols);
 
 // deconstructors
 void del_matrix(mymatrix* mat);

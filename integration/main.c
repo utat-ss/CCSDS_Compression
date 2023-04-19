@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -18,6 +19,7 @@
 #include "util/mymatrix.h"
 #include "util/datacube.h"
 #include "encoder/encoder.h"
+#include "predictor/predictor.h"
 #include "main.h"
 
 /**
@@ -69,6 +71,7 @@ void check_encoder(int argc, char* argv[]){
 
     // create random matrix data
     mymatrix* matrix = random_matrix(nrows, ncols, min, max);
+    logger("INFO", "input matrix\n");
     pretty_print_mat(matrix);
     pretty_save_mat(matrix, "output/sample_mymatrix.txt");
 
@@ -81,6 +84,7 @@ void check_encoder(int argc, char* argv[]){
     // decode
     mymatrix* decoded_mat = create_matrix(nrows, ncols);
     adaptive_decode_bitfile(decoded_mat, "output/encoded.bin");
+    logger("INFO", "decoded matrix\n");
     pretty_print_mat(decoded_mat);
     pretty_save_mat(decoded_mat, "output/decoded_mymatrix.txt");
 
@@ -176,10 +180,75 @@ void check_datacube(int argc, char* argv[]){
     return;
 }
 
+
+void check_predictor(){
+    logger_init("output/check_predictor.log");
+
+    int nrows = 3;
+    int ncols = 4;
+
+    mymatrix* mat_test = ordered_matrix(nrows, ncols);
+    pretty_save_mat(mat_test, "output/check_predictor_ordered_matrix.txt");
+
+    pretty_print_mat(mat_test);
+
+    float sum = 0;
+    int index;
+    for (int i=0; i<nrows; i++){
+        for (int j=0; j<ncols; j++){
+            sum = local_sum(mat_test, i, j);
+            logger("INFO", "local sum from (%d, %d) is %f\n", i, j, sum);
+
+            index = i*ncols + j;  // walk row-major to check correctness
+            switch(index){
+                // case 0 is (0,0) --> never predicted, always kept as original value
+                case 1:
+                    assert(sum == 0);
+                    break;
+                case 2:
+                    assert(sum == 4);
+                    break;
+                case 3:
+                    assert(sum == 8);
+                    break;
+                case 4:
+                    assert(sum == 2);
+                    break;
+                case 5:
+                    assert(sum == 7);
+                    break;
+                case 6:
+                    assert(sum == 11);
+                    break;
+                case 7:
+                    assert(sum == 14);
+                    break;
+                case 8:
+                    assert(sum == 18);
+                    break;
+                case 9:
+                    assert(sum == 23);
+                    break;
+                case 10:
+                    assert(sum == 27);
+                    break;
+                case 11:
+                    assert(sum == 30);
+                    break;
+
+            }
+        }
+    }
+
+    logger_finalize();
+}
+
+
 int main(int argc, char* argv[]){
     // check_encoder(argc, argv);
     // check_mymatrix_operations();
-    check_datacube(argc, argv);
-    
+    // check_datacube(argc, argv);
+    check_predictor();
+
     return 0;
 }

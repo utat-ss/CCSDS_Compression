@@ -44,6 +44,13 @@ myvector* random_vector(int size, int min, int max){
     return vec;
 }
 
+/**
+ * @brief return identity matrix
+ * 
+ * @param nrows 
+ * @param ncols 
+ * @return mymatrix* 
+ */
 mymatrix* identity_matrix(int nrows, int ncols) {
     mymatrix* mat = create_matrix(nrows, ncols);
     for (int i = 0; i < nrows; i++) {
@@ -55,6 +62,23 @@ mymatrix* identity_matrix(int nrows, int ncols) {
             }
         }
     }
+    return mat;
+}
+
+
+/**
+ * @brief return row-major matrix ordered 1,2, ... , N
+ * 
+ * @param nrows 
+ * @param ncols 
+ * @return mymatrix* 
+ */
+mymatrix* ordered_matrix(int nrows, int ncols){
+    mymatrix* mat = create_matrix(nrows, ncols);
+    for (int i=0; i<(nrows*ncols); i++){
+        mat_set_flat(mat, i, i);
+    }
+
     return mat;
 }
 
