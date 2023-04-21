@@ -42,6 +42,10 @@ void del_datacube(datacube* cube){
 }
 
 // ========== accessors ==============
+mymatrix* cube_get_frame(datacube* cube, int z){
+    return cube->frames[z];
+}
+
 float cube_get(datacube* cube, int z, int x, int y){
     return mat_get(cube->frames[z], x, y);
 }

@@ -21,6 +21,7 @@ datacube* random_datacube(int depth, int nrows, int ncols, int min, int max);
 void del_datacube(datacube* cube);
 
 // ========== accessors ==============
+mymatrix* cube_get_frame(datacube* cube, int z);
 float cube_get(datacube* cube, int z, int x, int y);
 void cube_set(datacube* cube, int z, int x, int y, float val);
 void cube_set_flat(datacube* cube, int z, int x, float val);

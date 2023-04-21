@@ -244,7 +244,7 @@ void adaptive_encode_mymatrix(mymatrix *mat, char *filename){
     int t = 0;  // sample index, using `t` to match CCSDS123 documentation
     int bit = 0;
     int bit_counter = 0;
-    unsigned int num_bits_used = D;
+    unsigned int num_bits_used = PARAM_D;
     uint32_t sample = mat_get_flat(mat, 0);
     uint32_t code;
 
@@ -347,10 +347,10 @@ void adaptive_decode_bitfile(mymatrix* decoded_mat, char* filename) {
             // the first pixel is unencoded, read it directly
             if (t==0){
                 // read first D bits
-                for (int ii=0; ii<D; ii++){
+                for (int ii=0; ii<PARAM_D; ii++){
                     c = BitFileGetBit(stream);
                     // logger("DEBUG", "c=%d\n", c);
-                    decoded = decoded | (c << (D - ii - 1));
+                    decoded = decoded | (c << (PARAM_D - ii - 1));
                 }
                 
             }
