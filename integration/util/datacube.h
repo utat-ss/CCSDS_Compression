@@ -16,6 +16,7 @@ typedef struct datacube{
 // ========== constructors ============ 
 datacube* create_datacube(int depth, int nrows, int ncols);
 datacube* random_datacube(int depth, int nrows, int ncols, int min, int max);
+datacube* ordered_datacube(int depth, int nrows, int ncols);
 
 // ========== deconstructors ============
 void del_datacube(datacube* cube);

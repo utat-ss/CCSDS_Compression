@@ -64,7 +64,9 @@ float vec_dot_prod(myvector* vecA, myvector* vecB);
 myvector* mat_vec_mult(mymatrix* mat, myvector* vec);
 mymatrix* mat_mat_mult(mymatrix* matA, mymatrix* matB);
 
-// checks
+int vec_compare(myvector* vecA, myvector* vecB);
+
+// debugging checks
 void check_mymatrix(void);
 
 #endif /* MYMATRIX_H */

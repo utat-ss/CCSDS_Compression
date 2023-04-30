@@ -9,7 +9,7 @@
 /* ============ constructors ================== */
 // TODO: make it work without malloc
 mymatrix* create_matrix(int nrows, int ncols){
-    mymatrix* mat = (mymatrix*) malloc(sizeof(mymatrix));
+    mymatrix* mat = (mymatrix*) calloc(sizeof(mymatrix), 0);
     mat->data = (float*) malloc(sizeof(float)*nrows*ncols);
     mat->nrows = nrows;
     mat->ncols = ncols;
@@ -18,7 +18,7 @@ mymatrix* create_matrix(int nrows, int ncols){
 }
 
 myvector* create_vector(int size){
-    myvector* vec = (myvector*) malloc(sizeof(myvector));
+    myvector* vec = (myvector*) calloc(sizeof(myvector), 0);
     vec->data = (float*) malloc(sizeof(float)*size);
     vec->size = size;
 
@@ -293,6 +293,31 @@ mymatrix* mat_mat_mult(mymatrix* matA, mymatrix* matB) {
     }
 
     return out_mat;
+}
+
+
+/**
+ * @brief returns 1 if the vectors are the same, 0 if difference
+ * 
+ * @param vecA 
+ * @param vecB 
+ * @return int 
+ */
+int vec_compare(myvector* vecA, myvector* vecB){
+    int ret = 1;    // assume same
+
+    if (vecA->size != vecB->size) {
+        logger("ERROR", "compare vector size mismatch, (%d) vs (%d)", vecA->size, vecB->size);
+    }
+
+    for (int i=0; i<vecA->size; i++){
+        if (vec_get(vecA, i) != vec_get(vecB, i)){
+            ret = 0;      // if different, break
+            break;
+        }
+    }
+
+    return ret;
 }
 
 /* =============== checks ============== */

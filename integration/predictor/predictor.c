@@ -51,7 +51,7 @@ float local_sum (mymatrix* mat, int x, int y){
     }
 
     // right side
-    else if (y == mat->ncols - 1) {
+    else if (y == (mat->ncols - 1)) {
         west = mat_get(mat, x, y-1);
         north = mat_get(mat, x-1, y);
         northwest = mat_get(mat, x-1, y-1);
@@ -73,9 +73,10 @@ float local_sum (mymatrix* mat, int x, int y){
  * @param mat 
  * @param x 
  * @param y 
+ * @param z
  * @return myvector* 
  */
-myvector* compute_local_diff_vector(datacube* cube, int x, int y, int z){
+myvector* compute_local_diff_vector(datacube* cube, int z, int x, int y){
     mymatrix* mat = cube_get_frame(cube, z);
     float ls = local_sum(mat, x, y);            // can't name the variable `local_sum` since it conflicts with function definition??
 
@@ -103,23 +104,23 @@ myvector* compute_local_diff_vector(datacube* cube, int x, int y, int z){
     vec_set(vec, 1, d_w);
     vec_set(vec, 2, d_nw);
 
-    // fill the rest of the vector with central differences
+    // fill the rest of the vector with central differences (differences between spectral bands)
     int z_idx = 0;
     float central_diff = 0;
     for (int i = 3; i<PARAM_P + 3; i++){
         z_idx = i-2;
 
         // if we run out of spectral bands, set it to 0
-        if ((z-z_idx) > cube->depth){
+        if ((z+z_idx) > (cube->depth-1)){
             central_diff = 0;     
         }
         else{
-            mat = cube_get_frame(cube, z-z_idx);    // grab previous spectral frame
-            ls = local_sum(mat, x, y);
-            central_diff = 4 * mat_get(mat, x, y) - ls;
+            mat = cube_get_frame(cube, z+z_idx);    // grab previous spectral frame
+            central_diff = 4 * mat_get(mat, x, y) - local_sum(mat, x, y);
         }
 
         vec_set(vec, i, central_diff);
     }
+
     return vec;
 }

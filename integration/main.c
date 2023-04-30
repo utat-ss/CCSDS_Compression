@@ -194,6 +194,8 @@ void check_predictor(){
 
     float sum = 0;
     int index;
+
+    // loop through array and check local sum
     for (int i=0; i<nrows; i++){
         for (int j=0; j<ncols; j++){
             sum = local_sum(mat_test, i, j);
@@ -244,11 +246,46 @@ void check_predictor(){
 }
 
 
+void check_local_diff_vector(){
+    logger_init("output/check_local_sum.log");
+
+    int nrows = 3;
+    int ncols = 4;
+    int depth = 5;
+
+    datacube* cube = ordered_datacube(depth, nrows, ncols);
+    pretty_save_cube(cube, "output/check_local_diff_ordered_datacube.txt");
+    pretty_print_cube(cube);
+
+    // only check the local 
+    myvector* vec_compute = compute_local_diff_vector(cube, 0, 0, 1);
+    pretty_save_vec(vec_compute, "output/check_local_diff_ordered_vec.txt");
+    pretty_print_vec(vec_compute);
+
+    // check that the vector matches
+    myvector* vec_ref = create_vector(vec_compute->size);
+    vec_set(vec_ref, 0, 0);
+    vec_set(vec_ref, 1, 0);
+    vec_set(vec_ref, 2, 0);
+    vec_set(vec_ref, 3, 4);
+    vec_set(vec_ref, 4, 4);
+    vec_set(vec_ref, 5, 4);
+    vec_set(vec_ref, 6, 4);
+    vec_set(vec_ref, 7, 0);
+
+    int compare = vec_compare(vec_compute, vec_ref);
+    assert(compare == 1);
+
+    logger_finalize();
+}
+
 int main(int argc, char* argv[]){
     // check_encoder(argc, argv);
     // check_mymatrix_operations();
     // check_datacube(argc, argv);
-    check_predictor();
+    // check_predictor();
+
+    check_local_diff_vector();
 
     return 0;
 }

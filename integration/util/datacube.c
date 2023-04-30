@@ -6,6 +6,14 @@
 #include "logger.h"
 
 // ========== constructors ============
+/**
+ * @brief Create a datacube object memory structure, but doesn't fill values
+ * 
+ * @param depth 
+ * @param nrows 
+ * @param ncols 
+ * @return datacube* 
+ */
 datacube* create_datacube(int depth, int nrows, int ncols){
     datacube* cube = (datacube*) malloc(sizeof(datacube));
     cube->depth = depth;
@@ -22,12 +30,50 @@ datacube* create_datacube(int depth, int nrows, int ncols){
 }
 
 
+/**
+ * @brief creates datacube with random values between min and max
+ * 
+ * @param depth 
+ * @param nrows 
+ * @param ncols 
+ * @param min 
+ * @param max 
+ * @return datacube* 
+ */
 datacube* random_datacube(int depth, int nrows, int ncols, int min, int max){
     datacube* cube = create_datacube(depth, nrows, ncols);
     for (int z=0; z<depth; z++){
         cube->frames[z] = random_matrix(nrows, ncols, min, max);
     }
 
+    return cube;
+}
+
+
+/**
+ * @brief creates datacube with entries filled as 0,1,2,3,...,end
+ *      counter does not reset on new frame
+ * 
+ * @param depth 
+ * @param nrows 
+ * @param ncols 
+ * @return datacube* 
+ */
+datacube* ordered_datacube(int depth, int nrows, int ncols){
+    datacube* cube = create_datacube(depth, nrows, ncols);
+    mymatrix* mat;
+    float count = 0;
+
+    // loop through all frames
+    for (int z = 0; z < depth; z++) {
+        mat = cube->frames[z];
+
+        // within frame, set flat, update tick up counter
+        for (int ii=0; ii<nrows*ncols; ii++){
+            mat_set_flat(mat, ii, count);
+            count++;
+        }
+    }
     return cube;
 }
 

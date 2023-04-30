@@ -45,7 +45,7 @@ $(OBJECTS): %.o:%.c
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(DEPENDENCIES)
-	rm *.out
+	rm -f *.out
 
 .PHONY: dumpvars
 dumpvars:	
