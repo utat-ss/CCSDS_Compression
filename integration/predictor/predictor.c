@@ -124,3 +124,31 @@ myvector* compute_local_diff_vector(datacube* cube, int z, int x, int y){
 
     return vec;
 }
+
+
+/**
+ * @brief initializes default weight values for predictor
+ * 
+ * @return myvector* 
+ */
+myvector* initialize_weight_vector(){
+    myvector* weight_vec = create_vector(PARAM_P + 3);
+
+    // top 3 are all 0's, corresponding to omega_N, omega_W, omega_NW
+    vec_set(weight_vec, 0, 0);
+    vec_set(weight_vec, 1, 0);
+    vec_set(weight_vec, 2, 0);
+
+    // set the weights corresponding to past spectral bands
+    // set first one
+    float current_value = 7 / 8 * pow(2, PARAM_OMEGA);
+    vec_set(weight_vec, 3, current_value);
+    float prev_value = current_value;
+
+    // build the other ones as 1/8 geometric decreasing ratio
+    for (int i = 4; i < PARAM_D + 3; i++) {
+        current_value = 1/8 * prev_value;
+        vec_set(weight_vec, i, current_value);
+        prev_value = current_value;
+    }
+}

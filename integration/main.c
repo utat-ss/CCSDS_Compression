@@ -253,16 +253,18 @@ void check_local_diff_vector(){
     int ncols = 4;
     int depth = 5;
 
+    // created data cube with 0,1,2,3,4, ... , N
     datacube* cube = ordered_datacube(depth, nrows, ncols);
     pretty_save_cube(cube, "output/check_local_diff_ordered_datacube.txt");
     pretty_print_cube(cube);
 
-    // only check the local 
+    // only check the local vector on the (0,0,1) value
+    // the (0,0,0) value is always kept as the raw value, since it's used for reference to decode everything else
     myvector* vec_compute = compute_local_diff_vector(cube, 0, 0, 1);
     pretty_save_vec(vec_compute, "output/check_local_diff_ordered_vec.txt");
     pretty_print_vec(vec_compute);
 
-    // check that the vector matches
+    // check that the vector matches hand calculations
     myvector* vec_ref = create_vector(vec_compute->size);
     vec_set(vec_ref, 0, 0);
     vec_set(vec_ref, 1, 0);
@@ -278,6 +280,9 @@ void check_local_diff_vector(){
 
     logger_finalize();
 }
+
+
+
 
 int main(int argc, char* argv[]){
     // check_encoder(argc, argv);
