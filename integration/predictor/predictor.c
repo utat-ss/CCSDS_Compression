@@ -1,11 +1,17 @@
 #include "predictor.h"
 #include "mymatrix.h"
 #include "datacube.h"
+#include "helper.h"
 #include "../main.h"
 
+#include <math.h>
+#include <stdlib.h>
+
+const float s_max;
+const float s_mid;
+const float s_min = 0;
+
 /**
- * @brief neighbour oriented local sum
- *
  * @param x     indices of a single matrix
  * @param y     
  * @param mat
@@ -141,14 +147,44 @@ myvector* initialize_weight_vector(){
 
     // set the weights corresponding to past spectral bands
     // set first one
-    float current_value = 7 / 8 * pow(2, PARAM_OMEGA);
+    float current_value = pow(2, PARAM_OMEGA)*7/8;
     vec_set(weight_vec, 3, current_value);
     float prev_value = current_value;
 
     // build the other ones as 1/8 geometric decreasing ratio
-    for (int i = 4; i < PARAM_D + 3; i++) {
-        current_value = 1/8 * prev_value;
+    for (int i = 4; i < PARAM_D + 3 - 1; i++) {
+        current_value = prev_value*1/8;
         vec_set(weight_vec, i, current_value);
         prev_value = current_value;
     }
+}
+
+
+/**
+ * @brief returns high-resolution predicted sample
+ * 
+ * @param datacube 
+ * @param x 
+ * @param y 
+ * @param z 
+ * @return float 
+ */
+float predict_calc(datacube* datacube, int z, int x, int y){
+    myvector* local_diff_vec = compute_local_diff_vector(datacube, z, x, y);
+    myvector* weight_vec = initialize_weight_vector();
+
+    // predicted central local difference d_hat(t)
+    float d = vec_dot_prod(weight_vec, local_diff_vec);
+
+    // sample value limit and mid-sample value
+    float s_max = pow(2, PARAM_D) - 1;
+    float s_mid = pow(2, PARAM_D-1);
+
+    float arg0 = d + pow(2, PARAM_OMEGA) * (local_sum(cube_get_frame(datacube, z), x, y) - 4 * s_mid);
+    float arg1 = mod_star(arg0, PARAM_R);
+    float arg2 =  pow(2, PARAM_OMEGA+2)*s_mid + pow(2, PARAM_OMEGA+1);
+
+    float ret = clip(arg1 + arg2, pow(2, PARAM_OMEGA + 2) * s_mid, pow(2, PARAM_OMEGA + 2) * s_max + pow(2, PARAM_OMEGA + 1));
+
+    return ret;
 }

@@ -1,9 +1,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 #define PARAM_D 14  // dynamic range (or bit-depth resolution)
 #define PARAM_P 5   // number of preceding spectral bands used for prediction at current band
 
+const extern float s_min;
+const extern float s_mid;
+const extern float s_max; 
 
 
 
@@ -22,6 +28,6 @@
 // range: max{32, D + Ω + 2} ≤ R ≤ 64
 // Increasing the register size R reduces the chance of an overflow occurring in the
 //  calculation of a high - resolution predicted sample value.
-#define PARAM_R
+#define PARAM_R MAX(32, PARAM_D+PARAM_OMEGA+2)
 
 #endif // MAIN_H

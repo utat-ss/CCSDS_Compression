@@ -1,9 +1,17 @@
 CC = gcc	# compiler
 LD = gcc	# linker
 
+# ---------- compile and linker flags ------------
 # make sure to have `-g` debug flag at the end or else it won't have debugging symbols
-CFLAGS = -I/usr/local/include -Iutil -I -Wall -g -c	# compiler flags
-LDFLAGS = -g # linker flags
+# sanitize address to help find memory leaks
+CFLAGS = -fsanitize=address -I/usr/local/include -Iutil -I -Wall -g -c	# compiler flags
+LDFLAGS = -fsanitize=address -g # linker flags
+
+# normal version
+# CFLAGS = -I/usr/local/include -Iutil -I -Wall -g -c	# compiler flags
+# LDFLAGS = -g # linker flags
+
+# ---------- libraries to include -------------
 # LIBS = -L/usr/local/lib -lgsl -lgslcblas -lm -Lbitfile
 LIBS = -lm
 
@@ -15,6 +23,7 @@ SOURCES :=	\
 	util/logger.c			\
 	util/mymatrix.c			\
 	util/datacube.c 		\
+	util/helper.c			\
 
 HEADERS := $(SOURCES:.c=.h)
 OBJECTS := $(SOURCES:.c=.o)

@@ -181,14 +181,14 @@ void check_datacube(int argc, char* argv[]){
 }
 
 
-void check_predictor(){
-    logger_init("output/check_predictor.log");
+void check_local_sum(){
+    logger_init("output/check_local_sum.log");
 
     int nrows = 3;
     int ncols = 4;
 
     mymatrix* mat_test = ordered_matrix(nrows, ncols);
-    pretty_save_mat(mat_test, "output/check_predictor_ordered_matrix.txt");
+    pretty_save_mat(mat_test, "output/check_local_sum_ordered_matrix.txt");
 
     pretty_print_mat(mat_test);
 
@@ -247,7 +247,7 @@ void check_predictor(){
 
 
 void check_local_diff_vector(){
-    logger_init("output/check_local_sum.log");
+    logger_init("output/check_local_diff.log");
 
     int nrows = 3;
     int ncols = 4;
@@ -282,15 +282,44 @@ void check_local_diff_vector(){
 }
 
 
+void check_predictor(){
+    logger_init("output/check_predictor.log");
+
+    int nrows = 3;
+    int ncols = 4;
+    int depth = 5;
+
+    // created data cube with 0,1,2,3,4, ... , N
+    datacube* cube = ordered_datacube(depth, nrows, ncols);
+    pretty_save_cube(cube, "output/check_predictor_datacube.txt");
+    pretty_print_cube(cube);
+
+    for (int z=0; z<depth; z++){
+        for (int x=0; x<ncols; x++){
+            for (int y=0; y<nrows; y++){
+                // skip the (0,0,0) pixel since it's never encoded
+                if (x==0 && y==0 && z==0){
+                    continue;
+                }
+                else{
+                    logger("INFO", "predict (%d, %d, %d) = %f\n", z,x,y, predict_calc(cube,z,x,y));
+                }
+            }
+        }
+    }
+
+    logger_finalize();
+}
 
 
 int main(int argc, char* argv[]){
     // check_encoder(argc, argv);
     // check_mymatrix_operations();
     // check_datacube(argc, argv);
-    // check_predictor();
+    // check_local_sum();
+    // check_local_diff_vector();
 
-    check_local_diff_vector();
+    check_predictor();
 
     return 0;
 }

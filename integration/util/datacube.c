@@ -132,7 +132,7 @@ void pretty_save_cube(datacube* cube, char* filepath){
     int ncols = cube->ncols;
 
     fprintf(fptr, "===== datacube start ===== \n");
-    fprintf(fptr, "depth=%d, nrows=%d, ncols=%d", depth, nrows, ncols);
+    fprintf(fptr, "depth=%d, nrows=%d, ncols=%d\n", depth, nrows, ncols);
 
     for (int z=0; z<cube->depth; z++){
         fprintf(fptr, "z=%d: ",z);

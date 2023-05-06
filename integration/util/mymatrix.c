@@ -9,7 +9,7 @@
 /* ============ constructors ================== */
 // TODO: make it work without malloc
 mymatrix* create_matrix(int nrows, int ncols){
-    mymatrix* mat = (mymatrix*) calloc(sizeof(mymatrix), 0);
+    mymatrix* mat = (mymatrix*) malloc(sizeof(mymatrix));
     mat->data = (float*) malloc(sizeof(float)*nrows*ncols);
     mat->nrows = nrows;
     mat->ncols = ncols;
@@ -18,9 +18,9 @@ mymatrix* create_matrix(int nrows, int ncols){
 }
 
 myvector* create_vector(int size){
-    myvector* vec = (myvector*) calloc(sizeof(myvector), 0);
-    vec->data = (float*) malloc(sizeof(float)*size);
+    myvector* vec = (myvector*) malloc(sizeof(myvector));
     vec->size = size;
+    vec->data = (float*) malloc(sizeof(float)*size);
 
     return vec;
 }
