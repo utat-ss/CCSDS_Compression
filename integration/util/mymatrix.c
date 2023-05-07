@@ -99,15 +99,15 @@ void del_vector(myvector* vec) {
 // getters, assume row major format
 float mat_get(mymatrix* mat, int i, int j){
     if (mat == NULL){
-        logger("ERROR", "matrix is null");
+        logger("ERROR", "matrix is null\n");
         return -1;
     }
-    else if (i>mat->nrows){
-        logger("ERROR", "out of range, matrix size is (%d, %d), trying to access row=%d", mat->nrows, mat->ncols, i);
+    else if (i>mat->nrows || i<0){
+        logger("ERROR", "out of range, matrix size is (%d, %d), trying to access row=%d\n", mat->nrows, mat->ncols, i);
         return -1;
     }
-    else if(j>mat->ncols){
-        logger("ERROR", "out of range, matrix size is (%d, %d), trying to access col=%d", mat->nrows, mat->ncols, j);
+    else if(j>mat->ncols || j<0){
+        logger("ERROR", "out of range, matrix size is (%d, %d), trying to access col=%d\n", mat->nrows, mat->ncols, j);
         return -1;
     }
 
@@ -117,10 +117,10 @@ float mat_get(mymatrix* mat, int i, int j){
 
 float mat_get_flat(mymatrix* mat, int i){
     if (mat == NULL) {
-        logger("ERROR", "matrix is null");
+        logger("ERROR", "matrix is null\n");
         return -1;
     } else if (i > (mat->nrows * mat->ncols)) {
-        logger("ERROR", "out of range, matrix size is (%d, %d) = %d, trying to access element=%d", \
+        logger("ERROR", "out of range, matrix size is (%d, %d) = %d, trying to access element=%d\n", \
                 mat->nrows, mat->ncols, (mat->nrows * mat->ncols), i);
         return -1;
     }
@@ -133,11 +133,11 @@ float mat_get_flat(mymatrix* mat, int i){
 
 float vec_get(myvector* vec, int i){
     if (vec == NULL) {
-        logger("ERROR", "vector is null");
+        logger("ERROR", "vector is null\n");
         return -1;
     } 
     else if (i > vec->size) {
-        logger("ERROR", "out of range, vector size is (%d), trying to access row=%d", vec->size, i);
+        logger("ERROR", "out of range, vector size is (%d), trying to access row=%d\n", vec->size, i);
         return -1;
     }
 
@@ -244,7 +244,8 @@ float vec_dot_prod(myvector* vecA, myvector* vecB){
     float result = 0;
 
     if (vecA->size != vecB->size){
-        logger("ERROR", "dot product size mismatch, (%d) vs (%d)", vecA->size, vecB->size);
+        logger("ERROR", "dot product size mismatch, (%d) vs (%d)\n", vecA->size, vecB->size);
+        // printf("dot product size mismatch, (%d) vs (%d)", vecA->size, vecB->size);
     }
 
     for (int i=0; i<vecA->size; i++){
@@ -307,7 +308,7 @@ int vec_compare(myvector* vecA, myvector* vecB){
     int ret = 1;    // assume same
 
     if (vecA->size != vecB->size) {
-        logger("ERROR", "compare vector size mismatch, (%d) vs (%d)", vecA->size, vecB->size);
+        logger("ERROR", "compare vector size mismatch, (%d) vs (%d)\n", vecA->size, vecB->size);
     }
 
     for (int i=0; i<vecA->size; i++){
