@@ -16,8 +16,15 @@ FILE* logger_fptr;
  * @param filename 
  */
 void logger_init(const char* filename){
-   if (LOG_TO_FILE){
-      logger_fptr = fopen(filename, "w+");
+   // hardcoded path, cuz I'm lazy
+   char sbuf[1000];
+   char WORK_ROOT_DIR[] = "/home/liyongda/Documents/GitHub/utat/CCSDS_Compression/integration/";
+   sprintf(sbuf, "%s%s", WORK_ROOT_DIR, filename);
+   printf("sbuf:%s\n", sbuf);
+
+   if (LOG_TO_FILE)
+   {
+      logger_fptr = fopen(sbuf, "w");
       fprintf(logger_fptr, "starting log\n");
    }
 }
