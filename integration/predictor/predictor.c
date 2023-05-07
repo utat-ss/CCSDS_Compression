@@ -97,6 +97,12 @@ myvector* compute_local_diff_vector(datacube* cube, int z, int x, int y){
         d_w = 4*mat_get(mat, x, y-1) - ls;       // on left side, can't go West, so go North
         d_nw = 4 * mat_get(mat, x, y - 1) - ls;  // on left side, can't go West, so go North
     }
+    // on top row of frame
+    else if (y==0){
+        d_n = 0;
+        d_w = 0;
+        d_nw = 0;
+    }
     // base case, not on left side and not on top of frame
     else{
         d_n = 4*mat_get(mat, x, y-1) - ls;
@@ -152,11 +158,13 @@ myvector* initialize_weight_vector(){
     float prev_value = current_value;
 
     // build the other ones as 1/8 geometric decreasing ratio
-    for (int i = 4; i < PARAM_D + 3 - 1; i++) {
+    for (int i = 4; i < PARAM_P + 3; i++) {
         current_value = prev_value*1/8;
         vec_set(weight_vec, i, current_value);
         prev_value = current_value;
     }
+
+    return weight_vec;
 }
 
 
