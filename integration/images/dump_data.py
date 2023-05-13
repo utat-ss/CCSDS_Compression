@@ -9,7 +9,7 @@ import numpy as np
 
 # keep the python file in the same folder as all the data
 in_file = "Indian_pines.mat"
-out_file = "data_full.txt"
+out_file = "indian_pines.txt"
 
 # load data as dict
 matlab_data = scipy.io.loadmat(in_file)
@@ -28,7 +28,7 @@ f = open(out_file, "w+")
 f.write(f"{zlen}, {xlen}, {ylen},\n")		# write z-dimension first
 
 # slice z = get frames, write each frame, go to next frame
-for z in range (0, len(data[:,:,0])):
+for z in range (0, zlen):
 	# get frame
 	frame = data[:,:,z]
 
