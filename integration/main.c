@@ -312,14 +312,26 @@ void check_predictor(){
 }
 
 
+void check_data_parsing(void){
+    char filename[] = "/Users/liyongda/Documents/GitHub/CCSDS_Compression/integration/images/indian_pines.txt";
+    // char filename[] = "/Users/liyongda/Documents/GitHub/CCSDS_Compression/integration/output/random_datacube_formatted.txt";
+
+    datacube* cube = parse_cube_from_file(filename);
+    // pretty_print_cube(cube);
+    save_cube(cube, "/Users/liyongda/Documents/GitHub/CCSDS_Compression/integration/output/parse_check_indian_pines.txt");
+}
+
 int main(int argc, char* argv[]){
+    // check_datacube(argc, argv);
     // check_encoder(argc, argv);
     // check_mymatrix_operations();
     // check_datacube(argc, argv);
     // check_local_sum();
     // check_local_diff_vector();
 
-    check_predictor();
+    // check_predictor();
+
+    check_data_parsing();
 
     return 0;
 }

@@ -170,7 +170,7 @@ void save_cube(datacube* cube, char* filepath){
     int ncols = cube->ncols;
 
     // write header
-    fprintf(fptr, "%d, %d, %d\n", depth, nrows, ncols);
+    fprintf(fptr, "%d, %d, %d,\n", depth, nrows, ncols);
 
     // write matrix data sequentially
     for (int z=0; z<depth; z++){
@@ -245,14 +245,14 @@ datacube* parse_cube_from_file(char* filepath){
     // now that we read the size, we allocate the appropriately size struct in memory
     datacube* cube = create_datacube(depth, nrows, ncols);
 
-    int z = 0;
+    int k = 0;
     int i = 0;
     float val = 0;
 
     // continue until end of file
     while (!feof(fptr)){
         // check if we went over
-        if (z >= depth){
+        if (k >= depth){
             break;
         }
 
@@ -263,7 +263,7 @@ datacube* parse_cube_from_file(char* filepath){
         // for the row, get pixel value
         while (i < (nrows*ncols)){
             // atof returns doubles, cast to float
-            cube_set_flat(cube, z, i, (float) atof(token));
+            cube_set_flat(cube, k, i, (float) atof(token));
             token = strtok(NULL, ",");
             if (token == NULL){
                 break;
@@ -278,7 +278,7 @@ datacube* parse_cube_from_file(char* filepath){
             i = 0;
 
             // go to next frame
-            z++;
+            k++;
         }
     }
 
