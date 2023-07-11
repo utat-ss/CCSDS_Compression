@@ -65,25 +65,24 @@
  */
 
 /***************************************************************************
-*                             INCLUDED FILES
-***************************************************************************/
+ *                             INCLUDED FILES
+ ***************************************************************************/
 #include <stdio.h>
 
 /***************************************************************************
-*                            TYPE DEFINITIONS
-***************************************************************************/
+ *                            TYPE DEFINITIONS
+ ***************************************************************************/
 
 /**
  * \enum BF_MODES
  * \brief This is an enumeration of the bit file modes (read, write, and
  * append)
  */
-typedef enum
-{
-    BF_READ = 0,    /*!< indicate that the file is for reading */
-    BF_WRITE = 1,   /*!< indicate that the file is for writing */
-    BF_APPEND= 2,   /*!< indicate that writes will be appended to the file */
-    BF_NO_MODE      /*!< end of enum */
+typedef enum {
+  BF_READ = 0,   /*!< indicate that the file is for reading */
+  BF_WRITE = 1,  /*!< indicate that the file is for writing */
+  BF_APPEND = 2, /*!< indicate that writes will be appended to the file */
+  BF_NO_MODE     /*!< end of enum */
 } BF_MODES;
 
 struct bit_file_t;
@@ -96,8 +95,8 @@ struct bit_file_t;
 typedef struct bit_file_t bit_file_t;
 
 /***************************************************************************
-*                               PROTOTYPES
-***************************************************************************/
+ *                               PROTOTYPES
+ ***************************************************************************/
 
 /* open/close file */
 bit_file_t *BitFileOpen(const char *fileName, const BF_MODES mode);
@@ -124,17 +123,17 @@ int BitFileGetBits(bit_file_t *stream, void *bits, const unsigned int count);
 int BitFilePutBits(bit_file_t *stream, void *bits, const unsigned int count);
 
 /***************************************************************************
-* get/put a number of bits from numerical types (short, int, long, ...)
-*
-* For these functions, the first bit in/out is the least significant bit of
-* the least significant byte, so machine endiness is accounted for.  Only
-* big endian and little endian architectures are currently supported.
-*
-* NOTE: size is the sizeof() for the data structure pointed to by bits.
-***************************************************************************/
+ * get/put a number of bits from numerical types (short, int, long, ...)
+ *
+ * For these functions, the first bit in/out is the least significant bit of
+ * the least significant byte, so machine endiness is accounted for.  Only
+ * big endian and little endian architectures are currently supported.
+ *
+ * NOTE: size is the sizeof() for the data structure pointed to by bits.
+ ***************************************************************************/
 int BitFileGetBitsNum(bit_file_t *stream, void *bits, const unsigned int count,
-    const size_t size);
+                      const size_t size);
 int BitFilePutBitsNum(bit_file_t *stream, void *bits, const unsigned int count,
-    const size_t size);
+                      const size_t size);
 
 #endif /* _BITFILE_H_ */

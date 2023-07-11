@@ -8,184 +8,181 @@
 // ========== constructors ============
 /**
  * @brief Create a datacube object memory structure, but doesn't fill values
- * 
- * @param depth 
- * @param nrows 
- * @param ncols 
- * @return datacube* 
+ *
+ * @param depth
+ * @param nrows
+ * @param ncols
+ * @return datacube*
  */
-datacube* create_datacube(int depth, int nrows, int ncols){
-    datacube* cube = (datacube*) malloc(sizeof(datacube));
-    cube->depth = depth;
-    cube->nrows = nrows;
-    cube->ncols = ncols;
+datacube *create_datacube(int depth, int nrows, int ncols) {
+  datacube *cube = (datacube *)malloc(sizeof(datacube));
+  cube->depth = depth;
+  cube->nrows = nrows;
+  cube->ncols = ncols;
 
-    cube->frames = (mymatrix**) malloc(sizeof(mymatrix*)*depth);
+  cube->frames = (mymatrix **)malloc(sizeof(mymatrix *) * depth);
 
-    for (int z=0; z<depth; z++){
-        cube->frames[z] = create_matrix(nrows, ncols);
-    }
+  for (int z = 0; z < depth; z++) {
+    cube->frames[z] = create_matrix(nrows, ncols);
+  }
 
-    return cube;
+  return cube;
 }
-
 
 /**
  * @brief creates datacube with random values between min and max
- * 
- * @param depth 
- * @param nrows 
- * @param ncols 
- * @param min 
- * @param max 
- * @return datacube* 
+ *
+ * @param depth
+ * @param nrows
+ * @param ncols
+ * @param min
+ * @param max
+ * @return datacube*
  */
-datacube* random_datacube(int depth, int nrows, int ncols, int min, int max){
-    datacube* cube = create_datacube(depth, nrows, ncols);
-    for (int z=0; z<depth; z++){
-        cube->frames[z] = random_matrix(nrows, ncols, min, max);
-    }
+datacube *random_datacube(int depth, int nrows, int ncols, int min, int max) {
+  datacube *cube = create_datacube(depth, nrows, ncols);
+  for (int z = 0; z < depth; z++) {
+    cube->frames[z] = random_matrix(nrows, ncols, min, max);
+  }
 
-    return cube;
+  return cube;
 }
-
 
 /**
  * @brief creates datacube with entries filled as 0,1,2,3,...,end
  *      counter does not reset on new frame
- * 
- * @param depth 
- * @param nrows 
- * @param ncols 
- * @return datacube* 
+ *
+ * @param depth
+ * @param nrows
+ * @param ncols
+ * @return datacube*
  */
-datacube* ordered_datacube(int depth, int nrows, int ncols){
-    datacube* cube = create_datacube(depth, nrows, ncols);
-    mymatrix* mat;
-    float count = 0;
+datacube *ordered_datacube(int depth, int nrows, int ncols) {
+  datacube *cube = create_datacube(depth, nrows, ncols);
+  mymatrix *mat;
+  float count = 0;
 
-    // loop through all frames
-    for (int z = 0; z < depth; z++) {
-        mat = cube->frames[z];
+  // loop through all frames
+  for (int z = 0; z < depth; z++) {
+    mat = cube->frames[z];
 
-        // within frame, set flat, update tick up counter
-        for (int ii=0; ii<nrows*ncols; ii++){
-            mat_set_flat(mat, ii, count);
-            count++;
-        }
+    // within frame, set flat, update tick up counter
+    for (int ii = 0; ii < nrows * ncols; ii++) {
+      mat_set_flat(mat, ii, count);
+      count++;
     }
-    return cube;
+  }
+  return cube;
 }
 
 // ========== deconstructors ============
-void del_datacube(datacube* cube){
-    for (int z=0; z<cube->depth; z++){
-        del_matrix(cube->frames[z]);
-    }
+void del_datacube(datacube *cube) {
+  for (int z = 0; z < cube->depth; z++) {
+    del_matrix(cube->frames[z]);
+  }
 
-    free(cube->frames);
-    free(cube);
+  free(cube->frames);
+  free(cube);
 }
 
 // ========== accessors ==============
-mymatrix* cube_get_frame(datacube* cube, int z){
-    return cube->frames[z];
+mymatrix *cube_get_frame(datacube *cube, int z) { return cube->frames[z]; }
+
+float cube_get(datacube *cube, int z, int x, int y) {
+  return mat_get(cube->frames[z], x, y);
 }
 
-float cube_get(datacube* cube, int z, int x, int y){
-    return mat_get(cube->frames[z], x, y);
-}
-
-void cube_set(datacube* cube, int z, int x, int y, float val){
-    mat_set(cube->frames[z], x, y, val);
+void cube_set(datacube *cube, int z, int x, int y, float val) {
+  mat_set(cube->frames[z], x, y, val);
 }
 
 /**
  * @brief given a frame in the datacube, set the direct flat array `i` value
- * 
- * @param cube 
- * @param z 
- * @param x 
- * @param val 
+ *
+ * @param cube
+ * @param z
+ * @param x
+ * @param val
  */
-void cube_set_flat(datacube* cube, int z, int x, float val){
-    mat_set_flat(cube->frames[z], x, val);
+void cube_set_flat(datacube *cube, int z, int x, float val) {
+  mat_set_flat(cube->frames[z], x, val);
 }
 
 // ========== display and printing =========
-void pretty_print_cube(datacube* cube){
-    printf("===== datacube start ===== \n");
-    printf("depth=%d, nrows=%d, ncols=%d\n", cube->depth, cube->nrows, cube->ncols);
-    for (int z=0; z<cube->depth; z++){
-        printf("z=%d: ",z);
-        pretty_print_mat(cube->frames[z]);
-    }
-    printf("===== datacube end ===== \n");
+void pretty_print_cube(datacube *cube) {
+  printf("===== datacube start ===== \n");
+  printf("depth=%d, nrows=%d, ncols=%d\n", cube->depth, cube->nrows,
+         cube->ncols);
+  for (int z = 0; z < cube->depth; z++) {
+    printf("z=%d: ", z);
+    pretty_print_mat(cube->frames[z]);
+  }
+  printf("===== datacube end ===== \n");
 }
 
-void pretty_save_cube(datacube* cube, char* filepath){
-    FILE* fptr;
-    fptr = fopen(filepath, "w");
+void pretty_save_cube(datacube *cube, char *filepath) {
+  FILE *fptr;
+  fptr = fopen(filepath, "w");
 
-    int depth = cube->depth;
-    int nrows = cube->nrows;
-    int ncols = cube->ncols;
+  int depth = cube->depth;
+  int nrows = cube->nrows;
+  int ncols = cube->ncols;
 
-    fprintf(fptr, "===== datacube start ===== \n");
-    fprintf(fptr, "depth=%d, nrows=%d, ncols=%d\n", depth, nrows, ncols);
+  fprintf(fptr, "===== datacube start ===== \n");
+  fprintf(fptr, "depth=%d, nrows=%d, ncols=%d\n", depth, nrows, ncols);
 
-    for (int z=0; z<cube->depth; z++){
-        fprintf(fptr, "z=%d: ",z);
+  for (int z = 0; z < cube->depth; z++) {
+    fprintf(fptr, "z=%d: ", z);
 
-        fprintf(fptr, "----- matrix ----- \n");
-        fprintf(fptr, "size: %d x %d = %d\n", nrows, ncols, nrows*ncols);
+    fprintf(fptr, "----- matrix ----- \n");
+    fprintf(fptr, "size: %d x %d = %d\n", nrows, ncols, nrows * ncols);
 
-        for (int i = 0; i < nrows; i++) {
-            for (int j = 0; j < ncols; j++) {
-                fprintf(fptr, "%5.3f ", cube_get(cube, z, i, j));  // %3d, at least 3 wide
-            }
-            fprintf(fptr, "\n");
-        }
+    for (int i = 0; i < nrows; i++) {
+      for (int j = 0; j < ncols; j++) {
+        fprintf(fptr, "%5.3f ",
+                cube_get(cube, z, i, j)); // %3d, at least 3 wide
+      }
+      fprintf(fptr, "\n");
     }
+  }
 
-
-    fprintf(fptr, "===== datacube end ===== \n");
-    fclose(fptr);
+  fprintf(fptr, "===== datacube end ===== \n");
+  fclose(fptr);
 }
 
 /**
  * @brief save datacube in specific format
  *      first row contains dimensions <depth> <nrows> <ncols>
  *      rest contains the data line-by-line in CSV format
- *      up to the parser to keep track of when new frames happen 
- * @param cube 
- * @param filepath 
+ *      up to the parser to keep track of when new frames happen
+ * @param cube
+ * @param filepath
  */
-void save_cube(datacube* cube, char* filepath){
-    FILE* fptr;
-    fptr = fopen(filepath, "w");
+void save_cube(datacube *cube, char *filepath) {
+  FILE *fptr;
+  fptr = fopen(filepath, "w");
 
-    int depth = cube->depth;
-    int nrows = cube->nrows;
-    int ncols = cube->ncols;
+  int depth = cube->depth;
+  int nrows = cube->nrows;
+  int ncols = cube->ncols;
 
-    // write header
-    fprintf(fptr, "%d, %d, %d,\n", depth, nrows, ncols);
+  // write header
+  fprintf(fptr, "%d, %d, %d,\n", depth, nrows, ncols);
 
-    // write matrix data sequentially
-    for (int z=0; z<depth; z++){
-        for (int i=0; i<nrows; i++){
-            // write out an entire row
-            for (int j=0; j<ncols; j++){
-                fprintf(fptr, "%f,", cube_get(cube, z, i, j));
-            }
+  // write matrix data sequentially
+  for (int z = 0; z < depth; z++) {
+    for (int i = 0; i < nrows; i++) {
+      // write out an entire row
+      for (int j = 0; j < ncols; j++) {
+        fprintf(fptr, "%f,", cube_get(cube, z, i, j));
+      }
 
-            // go to next row
-            fprintf(fptr, "\n");
-        }
+      // go to next row
+      fprintf(fptr, "\n");
     }
+  }
 
-    fclose(fptr);
+  fclose(fptr);
 }
 
 // ========== parsing =========
@@ -197,7 +194,7 @@ void save_cube(datacube* cube, char* filepath){
  *      then the data is written line-by-line
  *      it's up to the parse to keep track of when new frames happen
  *          in this case, we create a new frame every 2 rows
- * 
+ *
  *  5,    2,    4
     3.000000,6.000000,7.000000,5.000000,
     3.000000,5.000000,6.000000,2.000000,
@@ -213,75 +210,76 @@ void save_cube(datacube* cube, char* filepath){
  * @param filepath
  * @return datacube*
  */
-datacube* parse_cube_from_file(char* filepath){
-    FILE* fptr;
-    fptr = fopen(filepath, "r");
+datacube *parse_cube_from_file(char *filepath) {
+  FILE *fptr;
+  fptr = fopen(filepath, "r");
 
-    char* token;
+  char *token;
 
-    int depth = 0;
-    int nrows = 0;
-    int ncols = 0;
+  int depth = 0;
+  int nrows = 0;
+  int ncols = 0;
 
-    char temp_row[MAXCHAR];
+  char temp_row[MAXCHAR];
 
-    // grab header and immediately exit
-    while (!feof(fptr)){
-        // read the first row into temp_row
-        fgets(temp_row, MAXCHAR, fptr);
+  // grab header and immediately exit
+  while (!feof(fptr)) {
+    // read the first row into temp_row
+    fgets(temp_row, MAXCHAR, fptr);
 
-        token = strtok(temp_row, ",");
-        depth = atoi(token);
+    token = strtok(temp_row, ",");
+    depth = atoi(token);
 
-        token = strtok(NULL, ",");
-        nrows = atoi(token);
+    token = strtok(NULL, ",");
+    nrows = atoi(token);
 
-        token = strtok(NULL, ",");
-        ncols = atoi(token);
+    token = strtok(NULL, ",");
+    ncols = atoi(token);
 
+    break;
+  }
+
+  // now that we read the size, we allocate the appropriately size struct in
+  // memory
+  datacube *cube = create_datacube(depth, nrows, ncols);
+
+  int k = 0;
+  int i = 0;
+  float val = 0;
+
+  // continue until end of file
+  while (!feof(fptr)) {
+    // check if we went over
+    if (k >= depth) {
+      break;
+    }
+
+    // get row and split it up by commas
+    fgets(temp_row, MAXCHAR, fptr);
+    token = strtok(temp_row, ",");
+
+    // for the row, get pixel value
+    while (i < (nrows * ncols)) {
+      // atof returns doubles, cast to float
+      cube_set_flat(cube, k, i, (float)atof(token));
+      token = strtok(NULL, ",");
+      if (token == NULL) {
         break;
-    }
-    
-    // now that we read the size, we allocate the appropriately size struct in memory
-    datacube* cube = create_datacube(depth, nrows, ncols);
-
-    int k = 0;
-    int i = 0;
-    float val = 0;
-
-    // continue until end of file
-    while (!feof(fptr)){
-        // check if we went over
-        if (k >= depth){
-            break;
-        }
-
-        // get row and split it up by commas
-        fgets(temp_row, MAXCHAR, fptr);
-        token = strtok(temp_row, ",");
-
-        // for the row, get pixel value
-        while (i < (nrows*ncols)){
-            // atof returns doubles, cast to float
-            cube_set_flat(cube, k, i, (float) atof(token));
-            token = strtok(NULL, ",");
-            if (token == NULL){
-                break;
-            }
-            i++;
-        }
-
-        // check if new frame is reached
-        if (i % (nrows*ncols) == 0){
-            // logger("DEBUG", "frame reset i=%d, z=%d\n", i, z);
-            // reset counters
-            i = 0;
-
-            // go to next frame
-            k++;
-        }
+      }
+      i++;
     }
 
-    fclose(fptr);
-    return cube;
+    // check if new frame is reached
+    if (i % (nrows * ncols) == 0) {
+      // logger("DEBUG", "frame reset i=%d, z=%d\n", i, z);
+      // reset counters
+      i = 0;
+
+      // go to next frame
+      k++;
+    }
+  }
+
+  fclose(fptr);
+  return cube;
 }
